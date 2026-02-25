@@ -1,0 +1,964 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NBPVCJ0L43"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NBPVCJ0L43');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannello Admin - Dr. Vittorio Penzo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2C5F73;
+            --primary-light: #4A7C8F;
+            --secondary: #D4A574;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --bg: #F9FAFB;
+            --bg-card: #FFFFFF;
+            --text-dark: #111827;
+            --text-gray: #6B7280;
+            --border: #E5E7EB;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 2rem;
+        }
+        
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header h1 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-header p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 95, 115, 0.1);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 95, 115, 0.3);
+        }
+        
+        .error-message {
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Admin Dashboard */
+        .admin-container {
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--primary);
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .sidebar-header p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-nav {
+            padding: 2rem 0;
+        }
+        
+        .nav-item {
+            padding: 0.875rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: var(--secondary);
+        }
+        
+        .nav-icon {
+            font-size: 1.25rem;
+        }
+        
+        .logout-btn {
+            margin: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: calc(100% - 4rem);
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+        
+        .content-header {
+            margin-bottom: 2rem;
+        }
+        
+        .content-header h1 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .content-header p {
+            color: var(--text-gray);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 95, 115, 0.1);
+        }
+        
+        .btn-save {
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-save:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .success-toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .success-toast.show {
+            display: block;
+        }
+        
+        /* Image Upload */
+        .image-upload-container {
+            text-align: center;
+            padding: 2rem;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-container:hover {
+            border-color: var(--primary);
+            background: rgba(44, 95, 115, 0.05);
+        }
+        
+        .current-image {
+            max-width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-label {
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        /* Services List */
+        .services-list {
+            list-style: none;
+        }
+        
+        .service-item {
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .service-item input {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+        
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        
+        .btn-add:hover {
+            background: var(--primary-light);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🔐 Pannello Admin</h1>
+                <p>Dr. Vittorio Penzo - Gestione Sito</p>
+            </div>
+            
+            <div id="loginError" class="error-message hidden">
+                Password errata. Riprova.
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="passwordInput" class="form-input" placeholder="Inserisci la password" required>
+                </div>
+                <button type="submit" class="btn-primary">Accedi</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-container hidden">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <p>Dr. Vittorio Penzo</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-section="general">
+                    <span class="nav-icon">🏠</span>
+                    <span>Informazioni Generali</span>
+                </div>
+                <div class="nav-item" data-section="photo">
+                    <span class="nav-icon">📸</span>
+                    <span>Foto Profilo</span>
+                </div>
+                <div class="nav-item" data-section="bio">
+                    <span class="nav-icon">✍️</span>
+                    <span>Chi Sono / Biografia</span>
+                </div>
+                <div class="nav-item" data-section="services">
+                    <span class="nav-icon">💼</span>
+                    <span>Servizi & Prezzi</span>
+                </div>
+                <div class="nav-item" data-section="schedule">
+                    <span class="nav-icon">⏰</span>
+                    <span>Orari Disponibilità</span>
+                </div>
+                <div class="nav-item" data-section="contact">
+                    <span class="nav-icon">📧</span>
+                    <span>Contatti</span>
+                </div>
+                <div class="nav-item" data-section="areas">
+                    <span class="nav-icon">🎯</span>
+                    <span>Aree di Intervento</span>
+                </div>
+            </nav>
+            
+            <button class="logout-btn" onclick="logout()">🚪 Esci</button>
+        </aside>
+        
+        <main class="main-content">
+            <div class="success-toast" id="successToast">
+                ✓ Modifiche salvate con successo!
+            </div>
+            
+            <!-- General Info Section -->
+            <section id="section-general" class="section active">
+                <div class="content-header">
+                    <h1>Informazioni Generali</h1>
+                    <p>Modifica titoli e testi principali del sito</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Homepage - Hero Section</h3>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Titolo Principale</label>
+                            <input type="text" id="heroTitle" class="form-input" placeholder="Benvenuto nel tuo spazio di ascolto">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sottotitolo</label>
+                            <input type="text" id="heroSubtitle" class="form-input" placeholder="Supporto psicologico online professionale...">
+                        </div>
+                    </div>
+                    <button class="btn-save" onclick="saveGeneral()">Salva Modifiche</button>
+                </div>
+            </section>
+            
+            <!-- Photo Section -->
+            <section id="section-photo" class="section">
+                <div class="content-header">
+                    <h1>Foto Profilo</h1>
+                    <p>Aggiorna la tua foto nella sezione "Chi Sono"</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Foto Attuale</h3>
+                    </div>
+                    <div class="image-upload-container" onclick="document.getElementById('photoInput').click()">
+                        <img id="currentPhoto" class="current-image" src="" alt="Foto Profilo">
+                        <p class="upload-label">📸 Clicca per caricare una nuova foto</p>
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-top: 0.5rem;">Formato consigliato: JPG o PNG, max 2MB</p>
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*" onchange="uploadPhoto(event)">
+                </div>
+            </section>
+            
+            <!-- Bio Section -->
+            <section id="section-bio" class="section">
+                <div class="content-header">
+                    <h1>Chi Sono / Biografia</h1>
+                    <p>Modifica il testo della sezione "Chi Sono"</p>
+                </div>
+                
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label">Paragrafo 1</label>
+                        <textarea id="bioParagraph1" class="form-textarea"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Paragrafo 2</label>
+                        <textarea id="bioParagraph2" class="form-textarea"></textarea>
+                    </div>
+                    <button class="btn-save" onclick="saveBio()">Salva Modifiche</button>
+                </div>
+            </section>
+            
+            <!-- Services Section -->
+            <section id="section-services" class="section">
+                <div class="content-header">
+                    <h1>Servizi & Prezzi</h1>
+                    <p>Gestisci i tuoi servizi e le tariffe</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Seduta Individuale</h3>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Prezzo (€)</label>
+                            <input type="number" id="priceIndividual" class="form-input" placeholder="65">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Durata (minuti)</label>
+                            <input type="number" id="durationIndividual" class="form-input" placeholder="50">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Seduta di Coppia</h3>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Prezzo (€)</label>
+                            <input type="number" id="priceCouple" class="form-input" placeholder="75">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Durata (minuti)</label>
+                            <input type="number" id="durationCouple" class="form-input" placeholder="50">
+                        </div>
+                    </div>
+                    <button class="btn-save" onclick="saveServices()">Salva Modifiche</button>
+                </div>
+            </section>
+            
+            <!-- Schedule Section -->
+            <section id="section-schedule" class="section">
+                <div class="content-header">
+                    <h1>Orari Disponibilità</h1>
+                    <p>Configura gli orari di disponibilità per le prenotazioni</p>
+                </div>
+                
+                <div class="card">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Orario Inizio</label>
+                            <input type="time" id="scheduleStart" class="form-input" value="14:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Orario Fine</label>
+                            <input type="time" id="scheduleEnd" class="form-input" value="19:00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Giorni Disponibili</label>
+                        <p style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">Seleziona i giorni della settimana in cui sei disponibile</p>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-1" checked> Lunedì
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-2" checked> Martedì
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-3" checked> Mercoledì
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-4" checked> Giovedì
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-5" checked> Venerdì
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-6"> Sabato
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="day-0"> Domenica
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn-save" onclick="saveSchedule()">Salva Modifiche</button>
+                </div>
+            </section>
+            
+            <!-- Contact Section -->
+            <section id="section-contact" class="section">
+                <div class="content-header">
+                    <h1>Informazioni di Contatto</h1>
+                    <p>Aggiorna email e telefono</p>
+                </div>
+                
+                <div class="card">
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="contactEmail" class="form-input" placeholder="vittoriopenzo.psi@gmail.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Telefono (opzionale)</label>
+                            <input type="tel" id="contactPhone" class="form-input" placeholder="+39 123 456 7890">
+                        </div>
+                    </div>
+                    <button class="btn-save" onclick="saveContact()">Salva Modifiche</button>
+                </div>
+            </section>
+            
+            <!-- Areas Section -->
+            <section id="section-areas" class="section">
+                <div class="content-header">
+                    <h1>Aree di Intervento</h1>
+                    <p>Gestisci le aree di intervento mostrate sul sito</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Servizi Offerti</h3>
+                    </div>
+                    <ul class="services-list" id="areasList"></ul>
+                    <button class="btn-add" onclick="addArea()">+ Aggiungi Area</button>
+                    <button class="btn-save" onclick="saveAreas()" style="margin-left: 1rem;">Salva Modifiche</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = 'vittorio2024';
+        const STORAGE_PREFIX = 'penzo_admin_';
+        
+        // Default Data
+        const defaultData = {
+            general: {
+                heroTitle: 'Benvenuto nel tuo spazio di ascolto',
+                heroSubtitle: 'Supporto psicologico online professionale con approccio cognitivo-comportamentale'
+            },
+            bio: {
+                paragraph1: 'Sono il Dr. Vittorio Penzo, psicologo specializzato in terapia cognitivo-comportamentale. La mia missione è accompagnarti in un percorso di crescita e benessere psicologico.',
+                paragraph2: 'Credo fortemente nell\'importanza di creare uno spazio sicuro, empatico e non giudicante dove poter esplorare le proprie difficoltà e risorse personali.'
+            },
+            services: {
+                individual: { price: 65, duration: 50 },
+                couple: { price: 75, duration: 50 }
+            },
+            schedule: {
+                start: '14:00',
+                end: '19:00',
+                days: [1, 2, 3, 4, 5] // Monday to Friday
+            },
+            contact: {
+                email: 'vittoriopenzo.psi@gmail.com',
+                phone: ''
+            },
+            areas: [
+                { icon: '😰', title: 'Ansia e Disturbi d\'Ansia', description: 'Gestione dell\'ansia generalizzata, attacchi di panico, fobie e preoccupazioni eccessive.' },
+                { icon: '🌧️', title: 'Depressione', description: 'Supporto per stati depressivi, umore basso, perdita di interesse e difficoltà emotive.' },
+                { icon: '💑', title: 'Problemi di Coppia', description: 'Terapia di coppia per migliorare la comunicazione e rafforzare il legame affettivo.' },
+                { icon: '🌱', title: 'Crescita Personale', description: 'Percorsi di sviluppo personale, autostima e consapevolezza di sé.' },
+                { icon: '👨‍👩‍👧', title: 'Supporto Genitoriale', description: 'Consulenza per genitori su gestione dei figli ed educazione.' },
+                { icon: '🕊️', title: 'Elaborazione del Lutto', description: 'Accompagnamento nel processo di elaborazione delle perdite.' },
+                { icon: '⚡', title: 'Gestione dello Stress', description: 'Tecniche per gestire lo stress quotidiano e burnout lavorativo.' }
+            ]
+        };
+        
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                loadAllData();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+        
+        function logout() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('passwordInput').value = '';
+        }
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const section = item.dataset.section;
+                
+                // Update nav
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Update sections
+                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById('section-' + section).classList.add('active');
+            });
+        });
+        
+        // Load Data
+        function loadAllData() {
+            loadGeneral();
+            loadBio();
+            loadServices();
+            loadSchedule();
+            loadContact();
+            loadAreas();
+            loadPhoto();
+        }
+        
+        function getData(key) {
+            const stored = localStorage.getItem(STORAGE_PREFIX + key);
+            return stored ? JSON.parse(stored) : defaultData[key];
+        }
+        
+        function saveData(key, data) {
+            localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(data));
+            showToast();
+        }
+        
+        function loadGeneral() {
+            const data = getData('general');
+            document.getElementById('heroTitle').value = data.heroTitle;
+            document.getElementById('heroSubtitle').value = data.heroSubtitle;
+        }
+        
+        function saveGeneral() {
+            const data = {
+                heroTitle: document.getElementById('heroTitle').value,
+                heroSubtitle: document.getElementById('heroSubtitle').value
+            };
+            saveData('general', data);
+        }
+        
+        function loadBio() {
+            const data = getData('bio');
+            document.getElementById('bioParagraph1').value = data.paragraph1;
+            document.getElementById('bioParagraph2').value = data.paragraph2;
+        }
+        
+        function saveBio() {
+            const data = {
+                paragraph1: document.getElementById('bioParagraph1').value,
+                paragraph2: document.getElementById('bioParagraph2').value
+            };
+            saveData('bio', data);
+        }
+        
+        function loadServices() {
+            const data = getData('services');
+            document.getElementById('priceIndividual').value = data.individual.price;
+            document.getElementById('durationIndividual').value = data.individual.duration;
+            document.getElementById('priceCouple').value = data.couple.price;
+            document.getElementById('durationCouple').value = data.couple.duration;
+        }
+        
+        function saveServices() {
+            const data = {
+                individual: {
+                    price: parseInt(document.getElementById('priceIndividual').value),
+                    duration: parseInt(document.getElementById('durationIndividual').value)
+                },
+                couple: {
+                    price: parseInt(document.getElementById('priceCouple').value),
+                    duration: parseInt(document.getElementById('durationCouple').value)
+                }
+            };
+            saveData('services', data);
+        }
+        
+        function loadSchedule() {
+            const data = getData('schedule');
+            document.getElementById('scheduleStart').value = data.start;
+            document.getElementById('scheduleEnd').value = data.end;
+            
+            // Load days
+            for (let i = 0; i <= 6; i++) {
+                document.getElementById('day-' + i).checked = data.days.includes(i);
+            }
+        }
+        
+        function saveSchedule() {
+            const days = [];
+            for (let i = 0; i <= 6; i++) {
+                if (document.getElementById('day-' + i).checked) {
+                    days.push(i);
+                }
+            }
+            
+            const data = {
+                start: document.getElementById('scheduleStart').value,
+                end: document.getElementById('scheduleEnd').value,
+                days: days
+            };
+            saveData('schedule', data);
+        }
+        
+        function loadContact() {
+            const data = getData('contact');
+            document.getElementById('contactEmail').value = data.email;
+            document.getElementById('contactPhone').value = data.phone;
+        }
+        
+        function saveContact() {
+            const data = {
+                email: document.getElementById('contactEmail').value,
+                phone: document.getElementById('contactPhone').value
+            };
+            saveData('contact', data);
+        }
+        
+        function loadAreas() {
+            const data = getData('areas');
+            const list = document.getElementById('areasList');
+            list.innerHTML = '';
+            
+            data.forEach((area, index) => {
+                const li = document.createElement('li');
+                li.className = 'service-item';
+                li.innerHTML = `
+                    <input type="text" class="form-input" placeholder="Emoji" value="${area.icon}" data-index="${index}" data-field="icon" style="max-width: 80px;">
+                    <input type="text" class="form-input" placeholder="Titolo" value="${area.title}" data-index="${index}" data-field="title">
+                    <input type="text" class="form-input" placeholder="Descrizione" value="${area.description}" data-index="${index}" data-field="description">
+                    <button class="btn-delete" onclick="deleteArea(${index})">Elimina</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        function addArea() {
+            const data = getData('areas');
+            data.push({ icon: '✨', title: 'Nuovo Servizio', description: 'Descrizione del servizio' });
+            saveData('areas', data);
+            loadAreas();
+        }
+        
+        function deleteArea(index) {
+            if (confirm('Sei sicuro di voler eliminare questa area?')) {
+                const data = getData('areas');
+                data.splice(index, 1);
+                saveData('areas', data);
+                loadAreas();
+            }
+        }
+        
+        function saveAreas() {
+            const data = getData('areas');
+            const inputs = document.querySelectorAll('#areasList input');
+            
+            inputs.forEach(input => {
+                const index = parseInt(input.dataset.index);
+                const field = input.dataset.field;
+                data[index][field] = input.value;
+            });
+            
+            saveData('areas', data);
+        }
+        
+        function loadPhoto() {
+            const photoData = localStorage.getItem(STORAGE_PREFIX + 'photo');
+            if (photoData) {
+                document.getElementById('currentPhoto').src = photoData;
+            }
+        }
+        
+        function uploadPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const photoData = e.target.result;
+                    localStorage.setItem(STORAGE_PREFIX + 'photo', photoData);
+                    document.getElementById('currentPhoto').src = photoData;
+                    showToast();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function showToast() {
+            const toast = document.getElementById('successToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

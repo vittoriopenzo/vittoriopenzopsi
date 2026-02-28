@@ -16,6 +16,45 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyCP7chEuq2htBxi9jMNlFwAatSDndKyV6w",
+        authDomain: "vittoriopenzopsi-8bafd.firebaseapp.com",
+        databaseURL: "https://vittoriopenzopsi-8bafd-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vittoriopenzopsi-8bafd",
+        storageBucket: "vittoriopenzopsi-8bafd.firebasestorage.app",
+        messagingSenderId: "843610290485",
+        appId: "1:843610290485:web:48f21f1b665e979a3ab47c"
+      });
+      firebase.database().ref('settings').on('value', function(snap) {
+        const s = snap.val();
+        if (!s) return;
+        // Prezzi
+        document.querySelectorAll('.price-individual').forEach(el => el.textContent = '€' + s.priceIndividual);
+        document.querySelectorAll('.price-couple').forEach(el => el.textContent = '€' + s.priceCouple);
+        // Durate
+        document.querySelectorAll('.duration-individual').forEach(el => el.textContent = s.durationIndividual);
+        document.querySelectorAll('.duration-couple').forEach(el => el.textContent = s.durationCouple);
+        // Stat durata
+        document.querySelectorAll('.duration-stat').forEach(el => el.textContent = s.durationIndividual + "'");
+        // Orari
+        const start = String(s.scheduleStart).padStart(2,'0');
+        const end = String(s.scheduleEnd).padStart(2,'0');
+        document.querySelectorAll('.hours-display').forEach(el => el.textContent = start + '-' + end);
+        document.querySelectorAll('.hours-full').forEach(el => el.textContent = start + ':00-' + end + ':00');
+        // Giorni
+        const dayNames = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+        const days = s.availableDays || [1,2,3,4,5];
+        const sorted = [...days].sort((a,b)=>a-b);
+        const daysStr = sorted.map(d => dayNames[d]).join('-');
+        document.querySelectorAll('.days-display').forEach(el => el.textContent = daysStr);
+      });
+    </script>
+
     <style>
         :root {
             --primary: #2C5F73;
@@ -29,750 +68,103 @@
             --shadow: rgba(44, 95, 115, 0.08);
             --shadow-strong: rgba(44, 95, 115, 0.15);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Jost', sans-serif;
-            color: var(--text-dark);
-            line-height: 1.7;
-            background: var(--white);
-            overflow-x: hidden;
-        }
-        
-        h1, h2, h3, h4 {
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: 600;
-            line-height: 1.2;
-        }
-        
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1.5rem 0;
-            box-shadow: 0 2px 20px var(--shadow);
-            animation: slideDown 0.6s ease-out;
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            text-decoration: none;
-            color: var(--primary);
-        }
-        
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-size: 24px;
-            box-shadow: 0 4px 12px var(--shadow);
-        }
-        
-        .logo-text h1 {
-            font-size: 1.4rem;
-            color: var(--primary);
-            margin: 0;
-        }
-        
-        .logo-text p {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin: 0;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-            list-style: none;
-        }
-        
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-dark);
-            font-weight: 500;
-            position: relative;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--secondary);
-            transition: width 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-        
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-        
-        .btn-prenota-nav {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white) !important;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px var(--shadow);
-        }
-        
-        .btn-prenota-nav::after {
-            display: none;
-        }
-        
-        .btn-prenota-nav:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--shadow-strong);
-        }
-        
-        /* Hero Section */
-        .hero {
-            margin-top: 90px;
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 80%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(212, 165, 116, 0.08) 0%, transparent 70%);
-            animation: float 20s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-30px, 30px) rotate(5deg); }
-        }
-        
-        .hero-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .hero-content {
-            animation: fadeInLeft 0.8s ease-out 0.2s both;
-        }
-        
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .hero-content h1 {
-            font-size: 3.5rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            line-height: 1.1;
-        }
-        
-        .hero-content h1 span {
-            color: var(--secondary);
-        }
-        
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-            font-weight: 300;
-        }
-        
-        .hero-cta {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white);
-            padding: 1rem 2.5rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1.1rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s;
-            box-shadow: 0 6px 20px var(--shadow);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px var(--shadow-strong);
-        }
-        
-        .btn-secondary {
-            background: var(--white);
-            color: var(--primary);
-            padding: 1rem 2.5rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1.1rem;
-            border: 2px solid var(--primary);
-            transition: all 0.3s;
-        }
-        
-        .btn-secondary:hover {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        .hero-visual {
-            position: relative;
-            animation: fadeInRight 0.8s ease-out 0.4s both;
-        }
-        
-        @keyframes fadeInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        .brain-icon {
-            width: 100%;
-            max-width: 400px;
-            height: 400px;
-            margin: 0 auto;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 180px;
-            color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 20px 60px var(--shadow-strong);
-            animation: pulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        /* Stats Section */
-        .stats {
-            background: var(--white);
-            padding: 3rem 2rem;
-            box-shadow: 0 -4px 20px var(--shadow);
-        }
-        
-        .stats-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            text-align: center;
-        }
-        
-        .stat-item {
-            animation: fadeInUp 0.6s ease-out both;
-        }
-        
-        .stat-item:nth-child(1) { animation-delay: 0.1s; }
-        .stat-item:nth-child(2) { animation-delay: 0.2s; }
-        .stat-item:nth-child(3) { animation-delay: 0.3s; }
-        .stat-item:nth-child(4) { animation-delay: 0.4s; }
-        
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--primary);
-            font-family: 'Cormorant Garamond', serif;
-        }
-        
-        .stat-label {
-            font-size: 1rem;
-            color: var(--text-light);
-            margin-top: 0.5rem;
-        }
-        
-        /* Services Section */
-        .services {
-            padding: 6rem 2rem;
-            background: var(--bg-light);
-        }
-        
-        .section-header {
-            max-width: 800px;
-            margin: 0 auto 4rem;
-            text-align: center;
-        }
-        
-        .section-tag {
-            color: var(--secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-        
-        .section-title {
-            font-size: 3rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-        }
-        
-        .section-description {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            line-height: 1.8;
-        }
-        
-        .services-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-        
-        .service-card {
-            background: var(--white);
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px var(--shadow);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transform: scaleX(0);
-            transition: transform 0.4s;
-        }
-        
-        .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px var(--shadow-strong);
-        }
-        
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-        
-        .service-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px var(--shadow);
-        }
-        
-        .service-card h3 {
-            font-size: 1.6rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-        
-        .service-card p {
-            color: var(--text-light);
-            line-height: 1.7;
-        }
-        
-        /* About Section */
-        .about {
-            padding: 6rem 2rem;
-            background: var(--white);
-        }
-        
-        .about-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-        
-        .about-image {
-            position: relative;
-        }
-        
-        .about-img-wrapper {
-            width: 100%;
-            height: 600px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px var(--shadow-strong);
-            position: relative;
-            overflow: hidden;
-            background: var(--bg-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .about-img-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: center;
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .about-content h2 {
-            font-size: 2.8rem;
-            color: var(--primary);
-            margin-bottom: 2rem;
-        }
-        
-        .about-content p {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-        
-        .about-list {
-            list-style: none;
-            margin: 2rem 0;
-        }
-        
-        .about-list li {
-            padding: 0.8rem 0;
-            padding-left: 2rem;
-            position: relative;
-            color: var(--text-dark);
-            font-size: 1.05rem;
-        }
-        
-        .about-list li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--secondary);
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        /* Pricing Section */
-        .pricing {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%);
-        }
-        
-        .pricing-cards {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-        }
-        
-        .pricing-card {
-            background: var(--white);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px var(--shadow);
-            text-align: center;
-            transition: all 0.4s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pricing-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
-        
-        .pricing-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 40px var(--shadow-strong);
-        }
-        
-        .pricing-icon {
-            font-size: 60px;
-            margin-bottom: 1.5rem;
-        }
-        
-        .pricing-card h3 {
-            font-size: 1.8rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-        
-        .pricing-duration {
-            color: var(--text-light);
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-        }
-        
-        .pricing-price {
-            font-size: 3.5rem;
-            color: var(--primary);
-            font-weight: 700;
-            font-family: 'Cormorant Garamond', serif;
-            margin-bottom: 0.5rem;
-        }
-        
-        .pricing-period {
-            color: var(--text-light);
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .pricing-features {
-            list-style: none;
-            margin: 2rem 0;
-            text-align: left;
-        }
-        
-        .pricing-features li {
-            padding: 0.7rem 0;
-            padding-left: 2rem;
-            position: relative;
-            color: var(--text-dark);
-        }
-        
-        .pricing-features li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: var(--secondary);
-            font-weight: bold;
-        }
-        
-        /* CTA Section */
-        .cta {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .cta::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
-        
-        .cta-container {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .cta h2 {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            color: var(--white);
-        }
-        
-        .cta p {
-            font-size: 1.3rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.95;
-        }
-        
-        .btn-white {
-            background: var(--white);
-            color: var(--primary);
-            padding: 1.2rem 3rem;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.2rem;
-            display: inline-block;
-            transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-white:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--text-dark);
-            color: var(--white);
-            padding: 3rem 2rem 1.5rem;
-        }
-        
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 2rem;
-        }
-        
-        .footer-section h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: var(--secondary);
-        }
-        
-        .footer-section p, .footer-section a {
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.8;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.5rem;
-            transition: color 0.3s;
-        }
-        
-        .footer-section a:hover {
-            color: var(--secondary);
-        }
-        
-        .footer-bottom {
-            max-width: 1200px;
-            margin: 2rem auto 0;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        /* Mobile Menu */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--primary);
-            cursor: pointer;
-        }
-        
-        /* Responsive */
-        @media (max-width: 968px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .hero-container, .about-container {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-            
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            
-            .section-title {
-                font-size: 2.2rem;
-            }
-            
-            .brain-icon {
-                max-width: 300px;
-                height: 300px;
-                font-size: 120px;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .hero-cta {
-                flex-direction: column;
-            }
-            
-            .btn-primary, .btn-secondary {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .pricing-cards {
-                grid-template-columns: 1fr;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Jost', sans-serif; color: var(--text-dark); line-height: 1.7; background: var(--white); overflow-x: hidden; }
+        h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; font-weight: 600; line-height: 1.2; }
+        nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 1000; padding: 1.5rem 0; box-shadow: 0 2px 20px var(--shadow); animation: slideDown 0.6s ease-out; }
+        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--primary); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 24px; box-shadow: 0 4px 12px var(--shadow); }
+        .logo-text h1 { font-size: 1.4rem; color: var(--primary); margin: 0; }
+        .logo-text p { font-size: 0.85rem; color: var(--text-light); margin: 0; }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; position: relative; transition: color 0.3s; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--secondary); transition: width 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a:hover::after { width: 100%; }
+        .btn-prenota-nav { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white) !important; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s; box-shadow: 0 4px 12px var(--shadow); }
+        .btn-prenota-nav::after { display: none; }
+        .btn-prenota-nav:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow-strong); }
+        .hero { margin-top: 90px; min-height: 90vh; display: flex; align-items: center; background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%); position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 80%; height: 200%; background: radial-gradient(circle, rgba(212,165,116,0.08) 0%, transparent 70%); animation: float 20s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(-30px,30px) rotate(5deg); } }
+        .hero-container { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 1; }
+        .hero-content { animation: fadeInLeft 0.8s ease-out 0.2s both; }
+        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        .hero-content h1 { font-size: 3.5rem; color: var(--primary); margin-bottom: 1.5rem; line-height: 1.1; }
+        .hero-content h1 span { color: var(--secondary); }
+        .hero-subtitle { font-size: 1.3rem; color: var(--text-light); margin-bottom: 2rem; font-weight: 300; }
+        .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white); padding: 1rem 2.5rem; border-radius: 10px; text-decoration: none; font-weight: 500; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 6px 20px var(--shadow); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px var(--shadow-strong); }
+        .btn-secondary { background: var(--white); color: var(--primary); padding: 1rem 2.5rem; border-radius: 10px; text-decoration: none; font-weight: 500; font-size: 1.1rem; border: 2px solid var(--primary); transition: all 0.3s; }
+        .btn-secondary:hover { background: var(--primary); color: var(--white); }
+        .hero-visual { position: relative; animation: fadeInRight 0.8s ease-out 0.4s both; }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        .brain-icon { width: 100%; max-width: 400px; height: 400px; margin: 0 auto; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 180px; color: rgba(255,255,255,0.9); box-shadow: 0 20px 60px var(--shadow-strong); animation: pulse 3s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .stats { background: var(--white); padding: 3rem 2rem; box-shadow: 0 -4px 20px var(--shadow); }
+        .stats-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; text-align: center; }
+        .stat-item { animation: fadeInUp 0.6s ease-out both; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-number { font-size: 3rem; font-weight: 700; color: var(--primary); font-family: 'Cormorant Garamond', serif; }
+        .stat-label { font-size: 1rem; color: var(--text-light); margin-top: 0.5rem; }
+        .services { padding: 6rem 2rem; background: var(--bg-light); }
+        .section-header { max-width: 800px; margin: 0 auto 4rem; text-align: center; }
+        .section-tag { color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 1rem; }
+        .section-title { font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem; }
+        .section-description { font-size: 1.2rem; color: var(--text-light); line-height: 1.8; }
+        .services-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+        .service-card { background: var(--white); padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 20px var(--shadow); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
+        .service-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transform: scaleX(0); transition: transform 0.4s; }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px var(--shadow-strong); }
+        .service-card:hover::before { transform: scaleX(1); }
+        .service-icon { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary-light), var(--secondary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 1.5rem; box-shadow: 0 4px 12px var(--shadow); }
+        .service-card h3 { font-size: 1.6rem; color: var(--primary); margin-bottom: 1rem; }
+        .service-card p { color: var(--text-light); line-height: 1.7; }
+        .about { padding: 6rem 2rem; background: var(--white); }
+        .about-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .about-img-wrapper { width: 100%; height: 600px; border-radius: 20px; box-shadow: 0 20px 60px var(--shadow-strong); position: relative; overflow: hidden; background: var(--bg-light); display: flex; align-items: center; justify-content: center; }
+        .about-img-wrapper img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
+        .about-content h2 { font-size: 2.8rem; color: var(--primary); margin-bottom: 2rem; }
+        .about-content p { font-size: 1.1rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.8; }
+        .about-list { list-style: none; margin: 2rem 0; }
+        .about-list li { padding: 0.8rem 0; padding-left: 2rem; position: relative; color: var(--text-dark); font-size: 1.05rem; }
+        .about-list li::before { content: '✓'; position: absolute; left: 0; color: var(--secondary); font-weight: bold; font-size: 1.2rem; }
+        .pricing { padding: 6rem 2rem; background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%); }
+        .pricing-cards { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; }
+        .pricing-card { background: var(--white); padding: 3rem; border-radius: 20px; box-shadow: 0 8px 30px var(--shadow); text-align: center; transition: all 0.4s; position: relative; overflow: hidden; }
+        .pricing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .pricing-card:hover { transform: scale(1.05); box-shadow: 0 12px 40px var(--shadow-strong); }
+        .pricing-icon { font-size: 60px; margin-bottom: 1.5rem; }
+        .pricing-card h3 { font-size: 1.8rem; color: var(--primary); margin-bottom: 1rem; }
+        .pricing-duration { color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .pricing-price { font-size: 3.5rem; color: var(--primary); font-weight: 700; font-family: 'Cormorant Garamond', serif; margin-bottom: 0.5rem; }
+        .pricing-period { color: var(--text-light); font-size: 1rem; margin-bottom: 2rem; }
+        .pricing-features { list-style: none; margin: 2rem 0; text-align: left; }
+        .pricing-features li { padding: 0.7rem 0; padding-left: 2rem; position: relative; color: var(--text-dark); }
+        .pricing-features li::before { content: '✓'; position: absolute; left: 0; color: var(--secondary); font-weight: bold; }
+        .cta { padding: 6rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white); text-align: center; position: relative; overflow: hidden; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .cta::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); animation: rotate 20s linear infinite; }
+        .cta-container { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
+        .cta h2 { font-size: 3rem; margin-bottom: 1.5rem; color: var(--white); }
+        .cta p { font-size: 1.3rem; margin-bottom: 2.5rem; opacity: 0.95; }
+        .btn-white { background: var(--white); color: var(--primary); padding: 1.2rem 3rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 1.2rem; display: inline-block; transition: all 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .btn-white:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
+        footer { background: var(--text-dark); color: var(--white); padding: 3rem 2rem 1.5rem; }
+        .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--secondary); }
+        .footer-section p, .footer-section a { color: rgba(255,255,255,0.8); line-height: 1.8; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: color 0.3s; }
+        .footer-section a:hover { color: var(--secondary); }
+        .footer-bottom { max-width: 1200px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: rgba(255,255,255,0.6); }
+        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+        @media (max-width: 968px) { .nav-links { display: none; } .mobile-menu-btn { display: block; } .hero-container, .about-container { grid-template-columns: 1fr; gap: 3rem; } .hero-content h1 { font-size: 2.5rem; } .section-title { font-size: 2.2rem; } .brain-icon { max-width: 300px; height: 300px; font-size: 120px; } }
+        @media (max-width: 640px) { .hero-cta { flex-direction: column; } .btn-primary, .btn-secondary { width: 100%; justify-content: center; } .pricing-cards { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <a href="#home" class="logo">
@@ -793,16 +185,13 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-container">
             <div class="hero-content">
                 <h1>Benvenuto nel tuo <span>spazio di ascolto</span></h1>
                 <p class="hero-subtitle">Supporto psicologico online professionale con approccio cognitivo-comportamentale</p>
                 <div class="hero-cta">
-                    <a href="prenota.html" class="btn-primary">
-                        📅 Prenota una Seduta
-                    </a>
+                    <a href="prenota.html" class="btn-primary">📅 Prenota una Seduta</a>
                     <a href="#chi-sono" class="btn-secondary">Scopri di più</a>
                 </div>
             </div>
@@ -812,7 +201,6 @@
         </div>
     </section>
 
-    <!-- Stats -->
     <section class="stats">
         <div class="stats-container">
             <div class="stat-item">
@@ -820,12 +208,12 @@
                 <div class="stat-label">Online</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">50'</div>
+                <div class="stat-number duration-stat">50'</div>
                 <div class="stat-label">Durata Seduta</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">14-19</div>
-                <div class="stat-label">Orario (Lun-Ven)</div>
+                <div class="stat-number hours-display">14-19</div>
+                <div class="stat-label">Orario (<span class="days-display">Lun-Ven</span>)</div>
             </div>
             <div class="stat-item">
                 <div class="stat-number">24h</div>
@@ -834,7 +222,6 @@
         </div>
     </section>
 
-    <!-- Services -->
     <section class="services" id="servizi">
         <div class="section-header">
             <div class="section-tag">Aree di Intervento</div>
@@ -842,58 +229,27 @@
             <p class="section-description">Offro supporto psicologico specializzato in diverse aree, utilizzando l'approccio cognitivo-comportamentale</p>
         </div>
         <div class="services-grid">
-            <div class="service-card">
-                <div class="service-icon">😰</div>
-                <h3>Ansia e Disturbi d'Ansia</h3>
-                <p>Gestione dell'ansia generalizzata, attacchi di panico, fobie e preoccupazioni eccessive attraverso tecniche evidence-based.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">🌧️</div>
-                <h3>Depressione</h3>
-                <p>Supporto per stati depressivi, umore basso, perdita di interesse e difficoltà emotive con un approccio terapeutico strutturato.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">💑</div>
-                <h3>Problemi di Coppia</h3>
-                <p>Terapia di coppia per migliorare la comunicazione, risolvere conflitti e rafforzare il legame affettivo.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">🌱</div>
-                <h3>Crescita Personale</h3>
-                <p>Percorsi di sviluppo personale, autostima, consapevolezza di sé e raggiungimento degli obiettivi di vita.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">👨‍👩‍👧</div>
-                <h3>Supporto Genitoriale</h3>
-                <p>Consulenza per genitori su gestione dei figli, educazione, difficoltà relazionali e sfide della genitorialità.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">🕊️</div>
-                <h3>Elaborazione del Lutto</h3>
-                <p>Accompagnamento nel processo di elaborazione delle perdite e nella gestione del dolore emotivo.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">⚡</div>
-                <h3>Gestione dello Stress</h3>
-                <p>Tecniche per gestire lo stress quotidiano, burnout lavorativo e trovare un equilibrio vita-lavoro.</p>
-            </div>
+            <div class="service-card"><div class="service-icon">😰</div><h3>Ansia e Disturbi d'Ansia</h3><p>Gestione dell'ansia generalizzata, attacchi di panico, fobie e preoccupazioni eccessive attraverso tecniche evidence-based.</p></div>
+            <div class="service-card"><div class="service-icon">🌧️</div><h3>Depressione</h3><p>Supporto per stati depressivi, umore basso, perdita di interesse e difficoltà emotive con un approccio terapeutico strutturato.</p></div>
+            <div class="service-card"><div class="service-icon">💑</div><h3>Problemi di Coppia</h3><p>Terapia di coppia per migliorare la comunicazione, risolvere conflitti e rafforzare il legame affettivo.</p></div>
+            <div class="service-card"><div class="service-icon">🌱</div><h3>Crescita Personale</h3><p>Percorsi di sviluppo personale, autostima, consapevolezza di sé e raggiungimento degli obiettivi di vita.</p></div>
+            <div class="service-card"><div class="service-icon">👨‍👩‍👧</div><h3>Supporto Genitoriale</h3><p>Consulenza per genitori su gestione dei figli, educazione, difficoltà relazionali e sfide della genitorialità.</p></div>
+            <div class="service-card"><div class="service-icon">🕊️</div><h3>Elaborazione del Lutto</h3><p>Accompagnamento nel processo di elaborazione delle perdite e nella gestione del dolore emotivo.</p></div>
+            <div class="service-card"><div class="service-icon">⚡</div><h3>Gestione dello Stress</h3><p>Tecniche per gestire lo stress quotidiano, burnout lavorativo e trovare un equilibrio vita-lavoro.</p></div>
         </div>
     </section>
 
-    <!-- About -->
     <section class="about" id="chi-sono">
         <div class="about-container">
             <div class="about-image">
                 <div class="about-img-wrapper">
-                    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAAAAAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAJYAlgDASIAAhEBAxEB/8QAGwAAAwADAQEAAAAAAAAAAAAAAAECAwQFBgf/xAA+EAACAgEDAwIFAgUBBgYCAwAAAQIDEQQhMQUSQRNRBiIyYXEUgQcjQpGhUhUkM2KxwTRDcnPR4RaCNUTw/8QAGQEBAQEBAQEAAAAAAAAAAAAAAAECAwQF/8QAJBEBAQACAgIBBAMBAAAAAAAAAAECEQMxEiFBBBNRYRQiMkL/2gAMAwEAAhEDEQA/APoAABzbAAAAAAAAIAAAAAEMQAJjJAQmMlhYQCzgTIB8iATAMhkQgHkM5ELIFCFkMgMCchkiqDJOQyBWRpkZBMDJkMkZGgLGiMjXBUWikQilyIKRS8krg53WOuaXo2n77Zd1rz2Vp7stWTfToX6mjSUyt1FsKoR3bk8Hj+p/xE09PdX03TO+a/8AMseI/wBuTyXVusarq9/fqLW4r6a19MTluGTFyrrjx/l1tf8AFfXeoZUtbOqH+in5F/g5Uo33y7rbJzfvKWTJCL7TYhF9pnbpqNB6dx8f4EvVrknCUov7PB01XnmI/wBMn4IaLRfEHWOnzTo1tyS/onJyT/Znruk/xErm41dVo9N+bq+P3R4+zS5fBrz0rXgstiXCV9u0+oo1dEb9NbC2qXEoPKLwfHekdV13RL/U0k8Rb+aqW8ZflH0/onXtL1zT91X8u+K/mUt7x+/3R0mW3HLCx0wDAGnMAAAMAQAMAAAAAAAAEA0IYgAYAAIAABAMRQAAAAAAAAABIIAMgAAAAAAAAAAAAABDEAEsbJb3AT2JKe5HgLCbEDZLJoGRZAWQGJsQAGQyIAAAEwoyGReAIHkWQyIB5DuEAFZyNMgaYFplpmHJSkBlRaMaKlNQhKUuEm2U00us9Xq6Rona13XS2rhnl+/4Pmert1HUNVO/USc7JvL+32X2OxqZ39a19mstfbUn21x9orghaaEWcssnp4+PUcf9HJ+H/YqOhlyztdqS4QtjHk7eEcuvRv2M/wClwtkzeilkyRhyxtfCOYtPPhpmzVpXtk3oQWeEZlFY4Ls8Y509Dkw2aNqOyOx2kOKfgHjHnZ6SaT+VkUWarp+phqNLZKu2Dymj0ipi+URZoKbFxhmpWLg9d0DrlXW9D3bQ1NaxbX7P3X2Oo9mfMa3qeia2Gu02cR+qK4lHymfRtDraOpaGvV6eWa5r+z9mdcbt5M8PGs7GuBAaczGhDQAMQIBgAAAAADyGRAA8gLAwAAAoBDABAPAgAAAAAAAkAAyAAAAAAAAAAEMBAAAACZJTJYEvkl+Rsl+QsS+CRsQCYhsRAgAAAAAAJbGJhSyHgA8EAACAAEAAGRAFPJUWQNPcDPFnK6/rXTov08H/ADLttvC8nSUsJnkOpan9Vr7J/wBKeI/gmV9N8eO6xQarpUYmCctxym8MwOW7ONr2YxbnsOG7MOcmavlGW9NiEcszKOCK+DOkUKKMqWwkkZEiwTglVvO/BmUVyUVGv24FnBkkuTC+SpWaShZW4yWU/c3vhWX6bV6jSd2K5rvhHxlc/wCDnRZdFro1lV8eYyRrG6cOSbj2zECalFNcNZQHZ4zQCGgGAhgMAAAAAAAAEAAhgUAAACGAAAAAAACAAAAJAAMgAAAAAAAAAAEAAAAACZLKb2IbAlkFPySFiWIfgQCEMRAgAAAQxAAmAmFIfgQ/BAgAQCAAABAxZCmCJHkDFrLvQ0Vs1yovB49bLfk9L1qfb06X3kkeZb3OeTvxdG+GYHyZvBia3OdejEJGWC4JjEzQiR0bFSNhJ4MVUTYitiomJk4JS3Mnaa0gT2DJSjkpVoDE0YpQ3NqUUkYJFSsSW4ysbslo1HLJ63pNvrdLpb3ccxb/AAbhy/h+WdDOPtI6nlnadPFl2AyABDGIaKGAhgAAAAAAAAgABgAAAAAAAAAAAAIAACQADIAAAABAgGACAAAAAQxAJkspksCH5JKfBIWJYimSAsCKJIEAAACGIAfBBT4JCgAEQMkYgAkYgoEBOdgKyCJyNPYDmdfeNBFe80edW6PQfEH/AIKH/uI8/HdHLLt6OLoZ2Na7UQpe7X4M1su2Dweb1Nepusk0tvG5nTvi7H+16Ycr/IL4g00ZrwcWPRb7956iME/CW5Ufh2UJZjqsrzmI1F3XqdL1nTWvZ4f3OjDUQn9LPIVdMlTv6vdj7HV0l3ortbCx6CLTZl4WWaWmtU0nk3JNdpRp39Qjp1JtccHG1HxVbRLCoyvfJv6uiNknk5lnT9LbLE8v3KywS+K9TOWYVwS8pvJs1ddusjmcVHJm0vS9DWvlpi37t5Mt/TtLdHDrw/GHgsG3pNbDUxwniRtv6TiaXQy0l8ZKyTj7M7XNZWK7nw5b8l9f3TO4ee+Gl/M1En/pS/yehOuPTx8n+gAAaYNcAgXAIBjEMAAAAAAAAAABgHgAAWBgAYDAAAAAAIAACdgEMyAMgGwCAAAAAAAAAAB8AD4AgTHglgSySmSFhMkpkgAhiIJAAATABAD4JKfBIUCH5JfJACAAEIMgFJshjyIAK7lFZfBOTT6rdOjpWothzCDeCLjN3Seqyq1fTrY1WxnOt9zinusHmqpZTNLTapa2EroZi84aybOne8kcrdvXOPx9C1fK0zn2zjDKN298nH1MZzk4pbEdJGOzqPpNrKSI0/W3Zb6MK7rLHulBZzgx16edc5d1asUljdD0+ispvV1eYSjspLKePyWaS7+G8+pyrUXapRjNZXcuQlqG5d0SNbOWpqrpsx2QWETCCjXGCztsStR3+lXOUTruTwcXpa7Ulg683/LEWuf1S6VOnckeX1V+prgrXGTjLh8ZPS6+Kvq7JdyS32ONPT2WxjVObcIv5crg3HO7+Glo+q3yhCb0adcpOClGby2jsUdRbsxGyTS5hPlC0fS3RNWQnlrLSaxgVnTZ2ap3Sa7ny0X0Tfy7NU42KLN6P/DOZpoThFJ+DpVv5MMFjJoeq3aGM4Uwj3Te8pb4PU9N1b1ukVkku/iWODx7q/lSa5Op8F6h2aTV1Sbc4WZwbxt25cvHPG5PUIBJjOjxgaEMBjJQwGAAAAAAAIAAPGw1wCAAAAAAAADCABAMBABKQeRAZBkAAAAAAAAAAAAAB8AD4AkhlkMBMgt8EBYTJKYmAhDEQSAAAhDEFD4JKfBICyJjJ8gBORvgSIDwTkbJCkAmIA29zT6x/wDwus/9qRtk3UrU6W2h/wDmQcf7kvTWHrKPnfR4OrR9z/qkzo6fDsm8nJthZpFGl/K4y7Wv3Olpn23SjysI4voZflltW7NOVeUzfsXcY3DBEjRUcPDTHLaLXk21Wn4J9Fd26DWmh6UpeBwq3NyyKgjDWu6eEFjoaGOMHV7dsGjo4YkdBp+C4s1hnSpJrBhWjj5ibkPmf4MjWUaRprTqK2BVI2ewFAowem0Zq1sy3DYlbNhLEU3xc5QkvODa+GIPTdd1tX9M4qSOXdJR+Zc953/h2vv6hfdjaMFE1j2xyXWFel9xiGjs+eBoQIBoYkMBgAAAAAACAYAAAAAAAAYAAAMAABgBABAABkAAAAAAAAAAAAAAJ8DEAiWUyWBL4IKZIWEySnwS0AElEkCAAwFIQ8ksBBkBAJiGICRDYvBAic7jICgQZDIAXAhMywX2A8f8QdOrlq7pYxJruX7nH0t3ZqfSb+ZLDPX/ABJS/QV0Vv8ASzwMp+lrYTy99mccp7e7jy3i9HjYiSy8E1XxnVlAm2zLbJCO5br2yFfJnjBTWA05Wo2/sRpo792dzb11SjDjfBxrr7VX21z7JrhsK9Ho3mxex1O35d/Y8t07qnau2zt71y0dl692U4jhP3ZqM1sxz6mz2fJnOdo52tv1HF77OKwdF8GkNRysg8l1pNYHKOEwMfgxzfbFspPY1Ndeq6Z7+Aza1emxWr118232QeyPXfDkMU6mb/qswfP+ka1aaVzk8tvL/ufTelQUOn1yWPnXdlG8O3Hmy/rpu+QzgMgjq8SgEMBpYGhDXAAPAh5AAAAoGIAGAIAAAAAAAABDEAAAAQAAZAAAAAAAAAAAAAACGIBMlopifAGNkleRPkLEvgnkpkgBJRPuQITGJhU+RDEACYCAQmx+CWQITAQEslsbJYUBkQcEDjybEOMmvF7mxB7FGDqmneq6VqKorM3DMce5856loNJDT136PXy1Nj/4lXpYdXvl/k+pQe5zPRqs0Wtzp+zEpPhfMZs23hncfT51pr0o7HSpt7lk88rHVfKOMLuOnp70lyctPXjduzU+fybEZxgm20c+u5dmTR6hrpwg4weGyNs2t6hGc2k8nD1OshJNZMUlZPLy8swPSWv+nIVu6C6Pqbo27upSrT7fBGg6bPs7pSSb4Rks6NbJSbnDD+5uI2+ndeTeLD0FHUqrUvmPE0dI1dN28cx985OnCi2rdsD2dNkZLMXkcpI890vWTjeq5vZnbnLG7KiJ2JZRxuo2SlGUVwbVt69ZpvY5WvvxGTW7ZWbXc+Hvh2F/T49S9efqKT/ldqxt7nsOm1fp4zphHtq+qEfCzykcPQdb0Gi+GtGq7a3bhKVSfzJ+co73TbbtRp/Xtr7FN5hHHg7SPDyZW323QACualuMlFIoBiGiBggBAMAAAAAChDENAAAAAAAAgAAAAACAADIAAAAAEAwEADAQAAAIAFLgAfAEEvkr3JYWJZJTEAiSmQRR7kMvwyGACAQAyRiATexI85JZAhNjJYUmyGUyQELIPYRA48mxB7GsnhmaLA2IsiFb9O2EuJNsIyMiZR8l69pZaLrF1bWN8xf2MFVjjFM9Z8d9NctFHXwh3SrklL8M8PTqYyiss52PXx3cd2i3vWGy56J2vLexz9PdGM+UdOGpU4pJ4Ziukc7X6WVXaqXv7mk5a/GHPt+8YnfsrU1u8irqj5WUNtRy9PTrbN/X490bX6bXTXb+oUfuom7ZKmmLklgyaW+F01hZNRdtGvR62uW2pm39jZ/TdQce6dzkucNHoKaYYzhF2VR7Gn5Kza8/o4y/Uxz9UWdTVXuL7UzFVQqr3MnUNdzb3+5GWnZY1ltmjWnqb41pN5ljYNfq1BNLY6nwXoZ6/WT1Eot1VyW+OTePtyzupt7vpvQOlaGuE6tBT6uFmcll/wCTqkLZYQ8s7PHaY0JDWxUBSZI0BSAEADQxAQMaECAYAAANCAKYCAAAAAAAAAAACAADIMiAAAAAAABAMQgyA8hkQAAmwE2Fhe5LKIATJKfBIAyCvJJFJ8E5G+CQDwSxskAExktgITBiIESwbJb2CkxDJyQITBsTeQgLjIxbDTwFbEZmVSNNTxwZIzZRj6xVG/pOohJZXYz4xrKXpNTKP9OdmfaNZLOgvX/Iz5l1XSR1Fb2WVwYr0cU9ORVqotppnQrs+ZPu/seflGemscZZ+xvUanPkljeNekouyt2binFLOTgVah42Nyq+UluzGnSU9fObUu3f8EdOndCSaTRt1RVjWVk2664wWEkWLt2dFf3wXdszJqLez7o5tdvpbsWo1bcSsizVdsn/ANGaOr1namjU1urXqZT8HLtvt1lirrzngsZtZnVPX6lVw/uj6z8OaKrQdF09NaS2zJ+7PD9G6YtHT3Tw7Jc/Y9/0iSfT4pb42N4duPN/l0MjJGmdXlMaYgXJRa3BCQwKyMlFIAGIAKQCTDIDGIZAAAAAAAUAAAAAAAAABAABkIB52EAC8jEACAAAAAAEAmACAAB8EFEhSZJTJAXkkrySyKl8EFPghgAgEQIQCYAS+BvYlvYBMgpsgihk5GyGEDZORslhQIM4JbAoalhmNsUpdqbKMHVOoU6TSONssStfZBe+TyF0ctnO+Luqy/2/o4dzVdLTf9zpzcZvK3T3RjKPVwa05Ws0UNRFpxSa4aODbp7NPNxfHhnrnDf7GpqtFC9NN4+5mV0yw24mm1Ki+2TOnRbFs59nSLoSbhYnjwYnHVabLlXPC8pF7Ym49Rp71BbtGX18S7nLY8l/tKyPy75D9ddJbvYaXyeru1kWl8xp6jqHybSOHVPU3vtrqnN/ZM62k6BqtRBSvzWm/p+xdJvbSXrayxqvuefY9J0fpC09asll2Pdto3tB06nSw7YxS+/udKEFFbBZiIx7UkbXTeuQ6f1ejp+pklXqk/Tl/pkvH7mHCPFfGmr/AE/U+nyjL5q05bfk3h2zy6mL7QwRyuidRWt0NTcsy7Vv77HUOunhUmNEJ4KTApDRKKXIDRRIIChkjAY0IAGMQAMaEBAwAAAAAAAACgBABIABkIAABCGxAAALIALIZEAZDICyAxMWRAgAWRNhQxBnYTZNgZDG2Q2FIlg3sSyB+CcgJgAmxZBsBNkgyWwEycjzsyGyAbJYMlsKGycgyXwA2xZMcrYx5eDC9THw2y6NtiU0lyaWpv8AlaTFZe5GpdL5XyXSbfNPiWTl1q7L3XB2ei9ShqtLGucv5kFh5ON8Sx7er2NrdpPc5em1M9NdGyDw0zWWPlG+Lk8Mn0hRUksEWV4jjBzuk9Tr1laefm8r2OzhWR24PNrXb3Sy+45zhiWxsV1qSw917EXRcZexloeVsBu0aLT2Jd1UJLzmKM9fROnQbnHSVqb844J0skdSO8TUTTBDS11x7YxS+6G6lEyslsqMKe+DNGJjlKMd20jQ1vWqdLXL5vmQXboanVVaWmVts1GKXLPlPWupS6t1SzUP6PpgvsuDa63127qFjr7mq8+DiwfzI78eGvdePn5fL1H2b4ZvlV03SWJ7+mso9jp9VXqI/LJZ9meG6BldMo3/AKEdhTknmLaf2Olm3meoGjz0eqaur+qMkv8AUjYp6/By7b6ZQ/5ovKM60u3aRSMNF9V8O6myM19jKiKpMYkNANDJBAUMQ0AwEADAWRgMBBkCshkQAPICAgAAAJAAMqQgDwAgAkAEAsgMWRZEA2xCyLIU8ibELJAwzsTkWQHkWSWxNhVNkNibJIEIbEAhZBvYQB4JfAZEAmSNkNgJkPkJWRS3Zhlqa0vqQ0MhLeDBLVxXG5rz1Un9OxZibbVt0YLeRzr9bLLwKcpPLbyzVi/Um/sa8TZ+rKby2/wZI5wTgpNJFQZ92YbJZWEypS22MOcv8geF+MKu3XU2b4nDt/dM82e1+NNM/wBDVcvphPD/AHPEpmozWxptTbpLlZVJprx7nvOjdTr6hp8wf8xfVDyj55kzabU3aS+N1E3CyPDRnPDydOLmuF99PpN6UvJFKOV0zr1PUK/Ts/l6hL6W9pfj/wCDer1KU3uee42PdMplPTr0r7m9XZhcnGjrIr+omzqPbF4YNu1PUxgsto59/U4wTw1/c8/q+rdsW3NnA1nWJtuNb/c3jja55ckx7ek13WnGMn34PJ63qNmpm/mfaall9lrzOTf5MfcdscNPLnzXL1FZ9y9PH1dTXWuZyUTDnY3ehQ9br+jrxn+YmdHB9h6fTGnTVQjt2xSx+xubmHTR7Yo2CjHLLNaaeWjabMNiy9hSMMJ20S765SjJeUzsaHr1scR1GJr3xucriLclt5NVSTm3Hgzpp77T6irUw7qpJ+ceTKeI0+qnVJShNxf2O7pOuL6NTHP/ADx/7mfEdsDFXqaLVmF0X++DMllZTyvsRQhix7jQDAQwAAABgIAGNEoYDAQEDAAAkQ2IypCGIAJY2SAE+AbF4ACWwySwpiFkRBWScgSwHkWRCYDbJbEJhRkWRCzsQMkMktgMnIEWSUISk3wAStjCLbZp2dRrjlJZwaVtzsk99jTb+d7m5im3Qnr5vaKS+5gnqbJf1sxLAnguk2ffJ8ybE3sCQLcshtKyyu3HgpIJcFRik1g4mss1mhnK3TuNtT3dcluvwzsWzUYvya3peq33Lb2IpaHqNOvpcq04yivmhLwZZPcqFUKK+2EVFeyI5bC7DZCW5aWSGsMg0fiTSx1Pw7rFjeMO9P8AG58rR9mlWr9LbVJZU4uLX2aPjTj2TlDzFtG4xTQ8/KSHgqHBtPuTw17cnV0vVLNo2Sy1/UchPA1LBLJWsc7j09TDqPy/UYNV1NRjhSyzjVXtLDZFku6WTE446XmrJfq53N5eDVb3yUyJLY6anw4229skXmORkQ+koIG8bHd+CaPX+Ja5NbVwcsnnmz2n8PKU9XrLsZlGMYp/llH0iCwjKiI8GRcFEMxN4y0sv2MsuCWtv+4HJsndqLWpRlUk/pzyZY1qPBuWLfL4MfblZwSqxw2ZmgyFjJfgKzVyx5M6tsjvXZOH4ZpKTRmhLYg3YdV19Kwr3JLxJJmzX8R3La3Twl94vByu4XapDRt6Snrukt2krKn/AMyyjfqvpvWarIz/AAzxOHEJzce3tk0/s8DQ90Bxej9RckqLpZfEWzs5MdBgGQCgAAAGIMgMAAgQgAypeBAJgJk+RktgJslsbZDY2sAmDEQAgEACAGAnwSNsXgAzhENjZIUCbAn3IDJLHkTAWcM1NfZ20vHlm1k5/Ut6lh+SwrnxllGGS/mSwVBvgpxSakdGRjAktynLIIqDAknhleATwUNLYib+UvOxEmsbgaMJ5vlA2IrZ5NWz5NRGS98G5nZkEvcx4w2XknGWFIiUdzKluE1hAOj6kj5F1en9P1nW1f6bpJf3PrdTxM+afF1HofEmqSjhWYsX7rcsZrhxWXgbWNiU2t0VltblZSIYluA4rJkElgYARLdbFCYFVRctktxSzFtPwEJyh9LwTJuTzuBJ9B/hxX/u+smvM4r+yPnx9M/h5UodGss8zub/ALYLB7TtwhPgtbilhIoxbsFJrZrb3LwJoDDZvHkI5VUmKcWuGX/5ePcKwxTfgy9oLZFE0MfYzJWthMcXgaFdo4rAZ/YExoJxb4MNm00n5NrOxqWy7tTCP2yNDYrm65KSfDyex09nq6eufvFHjlE9R0uMo6CKln7EyixugIDCqQCBAMAAAAAAQhiMKQnwMlsBPggbJyCEQysksikACACR5EACAQCF4GSwEyWNskiglsb4JACWx5JYCZxdbKXrSWdvB1LrVCD33OFbKU7ZSbZrGJTg2uUZJLMMsw1yztk2Esxf4OkZY/ARyxKSwZItYKJBDBedgB8GN5Mj4JeANHVR2y+VuZKZOdUX5ZluScGYNK1iyG/yvJBlxke2AW4YyFS5b7Ib3WR9vkrC7QjFUvny/c8P/EDTuPV9NcltZTjP4Z7lbS/B5v4/o9Tpmj1KW9djg/w1/wDRYlfOlsysEv6ivBWUscFuDRVfkC4rumkVZUoRi1PLa3WDGm08opzcuSiXwJA+AAQhiIEfWfgWn0/hrTv/AFtyf9z5MfZ/hev0ehaOGOK1ksHbSaRjkzY2aMEo77FEpvI87BhoQESjkMbFMaeQIwCRkYogS4jSG3gWQqsMFyNMI7sClF4yakV3dQnHH0xRvR+k1dGu/U6i3w5YyBl4PT9MujZooJPeKwzzc1hm103VS02oSb+SWzJZuEelAWU1lcYA5tGhiACgEMAAAAQgBmFIhlMlgQyWUyPIqwmSMRACAQCABPgBZEMQCJH5J8BSbJB8iZAEsfklsBMlywm3wPwamru9OGExINLW6jMmk9jR2aymVY++T3MMoSX0nSMqg/mw9jbrefPJqVy57lv7mxU/nNRGFPDa9mZ48GHi2a+5nX0lCHHyCDOwESkyeeByHACHFtY3NWP8vVpNbS2N6S3NPVLtnCf+lgbUY45Fsh9+a1JeUQsuQFY2ZLbxjyZu3Ywy5AjG5zfi+lW/CWpfLh2zX9zqeTW63S9V8M6+lc+k5L9txB8dawyoil7jj4NMCWyCGyCQQ4AoAAAfAh+BAIkrySQOEe6yMfdpf5PunT6VTpqq1sowS/wfFOm1et1XSV/6rYr/ACfdNNwWDNwjG2ZZGNrcoS4JlhLI3sjHKWQGmOCzkS+kuADa2JMvgWwENbE4Zm2x4IaAIJtDjHEhw4LQA9oN+EafTG1RJPzJv/JtXvGns/8ASzX0S7dNDblFGxMxttYf3LkT4CPR9M1Cv0qTfzR2ZunnOl6h0alJv5ZbHozlZqtwDENEUwEMBgIAEIYjAlkMpkNhSZDKbIbJVgEAgAQCACRiYCExksBMlleCCKT4JfI2yWwEycjZLAlySTf2ONqr++b9joauzspaXJxJt5NQOL33G2miExpmmaaiZKv+IQuCq38+TUQr8x1U0+HjBae2xOrX8+D90OOyKDJXgSwPGwEeS4IXas+CorC8ADNfUQ7q5fg2OWLtynlAa2mn3UJc42NiEMrODT079LVTra2e6OgmkmgG2sGtY3uZm9mYZ7v7AYoM2oVq7TW1S4nFxf7rBrKKTNzTNID4hfVLT3WUz+quTg/yngxR5Oz8Uab9L8S6+GMKVnevw9zjR5NMKa2CHA3uhQ4AoAABPgEDEgB8klMjJB2Phin1viPSLG0Zdz/ZH2ehdta/B8p+AtOruvym1tXU3/fY+tQilDY1BTe5Ib7iWwE2NJGD6nsZbHnJjhswKa3Ljj2E/qKS2Attdr2RJaS7eBYXsBInyWuBqK9gIrWWZcNBCOGN4yBra2Tjp5LHOxlph20xXnCNfXZmq4R5ckbMcqJQ3sycoJNkoIaeJJ5PTaC9X6WMvKWGeXZvdN1v6e7tl9EuSZTax6MBJqSTT5GcmzGSMBgAASJ8DJZgTkhlsxvgLCZI2T5JVAhkgIAEAEsolgJkjYmAmyHwP3JbIpEsbZDYA+SGPyY7JdsG/YDm66zM8J8Gg5Jvky6ifdKTNXO+TcRmSWBY3BPYEtzSKGudiHlDhJdxUZNY2o1PG3BClsitam9LGS8SNeL+VblGxF5LMNbyZgAP3BoaWwEpvPI4yeGJoqMeQOfrH6dtdy8Pc3Yy74qS4e5Gqq9SmUcmPQ29+n7W/mjswNjBL4L8EAYZPDM2nk+4xWRLo2ks+4Hgv4haX0eu1XpfLfSt/utjyGMM+lfxG03qdL0mqUf+HZ2yfspLY+beSxlXgUdhrhijyVFAAAJ8CQ/DBYAlk4KlyLkg93/DnT5lrdQ1/pgn/k+jQeI4PIfw/wBMqugqzzdY5N/Y9fjD/wDg1A8ja+USeWE20tgMNiwiIp84CUst5LS22ASzjJSljyPtwhJAZE8oAjF45DD9wGuBrPuEYsrGAFnD5E5C3bE4lGvN9+srS/p3NrDRq1rOslL2WDbyELGULCRWdiWwE0LhoJMnOyYHp+nTc9FBvdrY2zU6d2/oa+1m0cq3DGJARTAAARDKySzAhkspkNhYliGxEqkJ8hkQAJjJYCE+BiYEtibG3sQyKTJ8MpshvkCWyWxslsCW0aust7KZfc2XtlnH19zlY4rhFg1JSymY0t8hJ7Dg35NRKtIpchs1sNe5pDlHMTGovOfBl7lwUkpIqJt+fRWJ52WTQjNdqeTpRTw452aONKXZKUP9LFG7Vam+TbUlg5VM8SOhGW24GXI09iFJYGmUClyXGTISeWVFe4Cm+fc59c3p9Yov6JHQkjS1tLlW5xXzLdAdCMc7+xEkGlsVulhPPK3/ACOT3AxyWETF4kZJLJj8IDW+JdN+u+FNbBLMow71+Y7nx1Ye590qgr6LKJvMZxcX+HsfE9ZpZaPXX6aaxKqbg/2KzWJcCiNcBFFQwZm0+mt1U3GqKbSy23hIi6i3TT7LY4eMoDF4Bcg2C5AT5JG+Rwg7JqC/qaX99iD7L8JUfp/hzRRa3dal/fc7ncmanTqf0+hoqxjsrjH/AAbXg0KS5JkthptITeUBrtPuMifGwNLLGkBUnsJZHyCX5ApSeMBkEvyPH5Aqt7hOSEtvBEpblApCc8Rf4JzhGK2WIBBpsycpPyzZMOnjiC+5m5QD8EpF+CM8gJ4xyJLKFLZMiE2ngD0PR2/07T4TOkc/pGJaaTXOToHO9txSASYyKEAAQSSxkswJbIZTJYWJENiJVSACABAACJzsMlgJshsbEyKnyS3yN+SX5AlslsbJYGO2fZW5HBtfdNs6evtUYKOeTjSsTZqFEkXGGVwYnPHJkqmttzSUJuHOxnrkpR3ZLhlPIku0sZXKvPALMPJUJpmZRU48GkYIWJy3OLqpKOutWeXk7FtLhLuXB5/q8vT1UJ+63BtsRn2s6FM8x5OJC1Tgmmb+nsaW7I06SZliadc8vk2IvYIylJ7GJb+ClxwUU2sESSlHAPkS5AwaWTqts08nt9cfwbXnBraqHp9l0Eu6L3/BsqSlWpR4YBjJE4+EZEyJblFaeXbPGT5z8e6F6X4glqEvk1UFZn/m4Z9Cg8TPO/xFpU+h6O/G8L+3P5X/ANBK+bL2GvIkNcsrLa0epjRKcbE/TmsSa5RXUL6bvTVMpSjFcyW5qCfAEjXIMS5IE+To9A0v63rujpxlOxN/hbnOlyen+AqY2fESnL+iuTQg+tRS7cDSy2iIrbkuDe+TQGmmSZHNeSVhsDH27lL7jklwuRY2AtYGiV+BgWh+5ji3vtsPIFvjk15vdlSngw5zkqDJr2zzJRXuZJywmacbO+5+yewHSrfy49jImYKt0ZkgL8GLhsyxWSZLACazExSi8bcmXhE8gb3RtS6r3W38rPRI8fU/TtjJbYZ62uXdXF+6MZNRYyRoyqgACKxshlZJZgS2QUSGoTEPwSSgEAgAQCbATJbGSAnwSxslkVLJfkfkmT5Al8ES4KbMN8u2uTA4+ts9S5r2NP092ZpNynJ/cnKNxGvOMkRGztNvCaMc6E45XJorZpmpxMzhsc6iTrs7Wzpx+aOSxlgcGjNTJpYyDjgeyRplU2meY69FOax7HoHLk8/1vfGCjl6O9Ndud0daiafk8srnRfJp4R2tFqu+MWnlMxY1K7cGbdWGjmQsN2m3MSK3IopLkwqZcJ7FiHjcqKJzuVFNMoqUItYfk1dM3XZOhv6d459jacjT1ua3C9YXbLEvuijbfLH25QoYlFS5TXJXcEYcYkc74w036v4R1KxmVXbbF+2Hv/g6U382TLOtarQXad4xZBw3+6BXw1PgceQnXKqyVcvqg3F/lBHkrKhAwATEinwSiBSPafw5octbrL8bRjGCf5PFPbLPpX8PtP6fSrLfNlr/ALIQe5jH5UNxwuAgy2aGBkqWHtsOyeHgmCy9/IGRNPdsp9vuCph28IarrXsBLmkuG/2MTufiuf8AY2u1JbENf/7IGODnKPDX5H22p/09plgOZUYOx+THJpJ4M0pbM0r7Y1QlKcsJLJRqa/VqmDWd5LZGDRWZWW9zg26yet13c9oxeInT0j25YHoq5fKZovCOdp5vHJup5IM6kRJ5YRYpc5AaWUY3mLMkGE0gCGG0eroedPD8Hk1sej6bf62mSb3jsZyajcQ0IEYVSAOQIrES2NslmFTkT4AT4CpAAAlgDEQBLGJgJ8EMr3JfAEslsbJZFS9iXvkbJfDAlmtq3ipr3Nl8HL11zz2oQaNj7VtuYUm1xgytZ5F3xWyOibRHKZk8CbytkQ2yxBOClLKW5t0TxBJs00pvgO6yDTaLErptJoh14XJhq1Cns9mbL4NxhrSg0cTq0Mwfk703szj9UX8mX4KPB62TjZJN/Y2ek3TjhZyvGSNRpLdXba6o57Vl/ZGbpleEjFbj0tMu6CZtUWJJrG5o0y7YqJl9TD5Mrp04TybNfDZyIX4fJvUXrHITTcS34MiW5jhNe5ng1+TUEOLInT6sHBpNMzvGRLnYqOforZKD08vqreMfbwbfk0Na/wBLra719MtpHQTzuBEtzY0r3MMtmXRJKX5A+UfF+jeh+KNZBLEbGrY/iX/3k4sWe6/iTo/5uh1yW7Tqk/8AKPCQ4DKxABQMlDfBK8kCbPsnwrpP0vQ9LDG7j3P9z5DpKJarW00RWXOaR9z0Far08IwW0YpL+xYNtLtFJtJvJXEdzBdNKGDQ15z+fwZqd3nOxqLMmbddacVu848EG01hcGPKWWCioryGFjdAX6kOO5E92HxkajDH0oWF7IBKbT2RM5y9kZEokTS9iojLccnlviDqWNR+irl8+O6f48HqJPtg2fPesT7fiXVy8OEcFhVaVL1uTt6fZHE0Ue6Tlk7NL2KR1dOzfrexzNOdCD2Mq2oSWeSm1v5NdPDMiy0ALdA2NIHHIRKaaOn0eztucPDRzVHCZs6Czs1UPyKsemAE8rIHKtQwEBFYmyGUSzCkSNkhQLyMQEgAnwQBPkZOQEyWMl8ASyWU+CWRUPkl8lPyQwMdtirg23jY4Op1Cdja33N3qVjz2LyjmOO++5rGIxetKQk5L3M0YL2LUF7GkKqyLRl7VyjHKhYzHZiplLuxIsRnisFpLPAKOUPG5uJROiMllIaWFh+C4PKCWCssUuGczqMU6pN+x0pPByepSfpy+6Gxyuj6bvjrLHsprsRzdFD0/lfKeD02jpjTp4xxjO7OFKHp622OMLuOe3TTbi9i+UY4ZaMkERTWTNXb2c4MaWGU4rGUVXRpvUnyjoUzysHnoWuEjqabUJ4yWVmx087MaREJJoyRZplrazSrU6eUHjjY1en6hyodM9ran2SXv7M7Cisbo5GtqWl1kL4r5J/LLAGxnJde0kKPGVx4HHaQHO+MdD+u+F9UorM6krY/t/8AR8ggfenCN+nlXNZjNOLX2aZ8M1mmlouoajSz+qqbg/2exUY0IACDwSN8CyQdz4Q0v6jr9Un9NScv/g+w6eOIL8Hzn+H+jy9RqWvKgv2PpVce2KRYCcmkzn6i7Mu03L59lbfJyc+pqNijcrg3j2NqOyMdUMLGDMo/gBqQNvHgMCwENTaTF3N+w2nhiSygHF/gmTZaiyJLcoxWv5MHz34pa03WoTX9dSz+zZ9BtezPn/x7W4S0d6/1Sg/+xYVXTbO6vu92dis4XQV6mgTZ2apbrJSOtp3sdGvg5ennssI6VU248GVbUYmTCSMEJNmXlcgPOGDewhvgInJdEu2+L9mSlkI7TyB6ut5ri/dFmHSy7tPH8YMpyrcMAAisBI2xGGtEyRslvADJYyfIAJjJIEJjJYCIKfBICZDY2JkVHuS3sUzFbLtrbEHJ1su61s0nuzPdNSmyUts4NxnbHwio7jaCCNC+7YjCznBTCKLEZ63lF9qMaWEVF7mmVKGCJrky+DE2smtIwzyllnL1S9WUY/c6lrzFpHPiu6bfhGMrpZFe5wtfU4a1yXDWTvM5fVEk4M5x1a9LyjPBbmpTPDNuuSZUZMIpLMR4TKitgMLryx1WOqzDZsKtNZMF9eJ5SA6tGo7lszbhZvycXT2dsUsnQpm3wajNdWMu5coxaihX0yg8PPAqnhYNiKyjTLl0Tar7J/XDZmSOe/PuPXVOqauXDeJbBXuFblXB8v8Aj7QfpviCOpjHENTBSf8A6lsz6fS8PB5j+IWgeo6JXqoLMtPZl/8ApfJUfLxFY3G4Sx3drx74IiPBI/BVVbtthWt3JpAfUvgnSPT9Docl81mbH+GeuzhZOd0rTLT6OuCW0YxS/sbd1iri3nCRqDR19/zKCez5Ho6cNSa5NBN6vUZx5O1SsRS9gMqSGmmJhFbsIY0DWBLdgVL6WxQ4HjYFsUXnCME3mRklLCNfLb3AUlk8r8baT1+g2SjH5q5Ka/Y9W+Dl9aq9fpWrh71Sx/YDx3QpdnS6/d7nVpfdJM4HSLf9whHOMLB3NJnyUjsULc6Nf0bHNofB0a5pR3JVZ685NmKyakJps265JoBoonhjTCFwLO4pcktgej6ZLu03PDN053SH/u7/ACdA51uKASAyrAyXwMDDSRDYgJYAxABJRACYmNiZBAhiAlkMt8kMgh8mrrZdtEvubT8nN19mflbLBy5vDMtbTiYmsscG4yOkRka3KikkVFd2+BuPJYjH5Lgs5J7NzJFYWxYyvtWAURxKUkWIT2juYJMzTksbGvLcow2TznHJhUVH8+Rzfz4H4OWVbxY3ycvq3Ff2bOs0cjrO0IY9zEbaEHubVbwc+uWGjdhI2kbkZZRkiYYYxsZocAZaypw70xVrfkzKL3A53a4Pfg29PeirKcx4RqYdc+Ssu7RdmJuVWZWOTjaa3KOhTPHk1KlbttcbqJQb5RzqcpOMuYnSrkpI1dXBVz9VeeSoITwx6/TR6h0vUaaW/qVuP+NjFF7m7R8yaKPg86502SrksThJxf5OpXqYS0sF6kVGMcSg+TZ+MdD+g+JtT2rFd2LY/vz/AJPPMiCzHfLt4zsdX4Z0n6vr2ng+Ivvf7HIe7PZfw90bt6jqNQ1tCKjn8gfS4JV1LfwczqGob+SL5N7WWqml+5x9JGWr1nc89seTQ3un6b06u5r5pHShFY8mKPslsjPHOAG4IIwE3IIyeSopxBITkwUmQZMEtJB3Y3Ic+dyiLHsYsocpNslrYAb2NfUQ7tPaveD/AOhnwRdtTLPsB82jVHRyjWvKydzRySjFeWcvqtTq1FEsbSTX+ToaN5sivsVXao5RvxXyo0KdsHQqeY8GRUW0bNMttjA0XVLGclG1u/A0sIUZxYNgEiWsoTbyGWEdno1v1VnXPOdMn2auP32PRmMu2oaAQGFYAADDaWhDEAiSmIBEPksggTJ8lMlgT7iKFgCGQy5GNkES2TOHrLM2Pc7N8u2qTzwjztzc5tlgSfkHPDHCttblOnJ0ZZdNYpbM2JReduDTjW4boz1z23bNRFNP2D5sYwWmGSsseJYYdsnwZVyPujFZbNQa7jIxTfYmzLZfF5wakrHNvfYlIxwzKTkzJ4KUVFYwJnDKuuMY2cvrEc1Qf3wdVo0epwzpc+zySK881hGeqzbBCXcSmoWNHRI6MJ7cmxXPbk0qpdyNiD3A3K57m3B7s58XubtTy/2Ayt7GrfBZNoxWwyGWGiWHydGiWUjkr5ZNG7RPHksHcp4KsirIOLNXT2N+TYUvubZaVXyuUHzF/wCDaql25NfVLscblnZ4lj2ZcWvcaHkv4j6JT0el1y+qubrl+Hx/k+ceWfZPijTfrfhnWV4zJQ9SP5W58bbIhH1X4C0f6boMb2vmufc39j5XGLnJQisyk1FL7n2aqS6V0WmtYThWo7e+ArH1PVK2xxjvjwb+h0y0+minvOazJnK6TU9TqHdaswg85+534vul3Pk1EVGPumZFsJFx5CJYRTyU1gcWgFh+wvJTklsR3LJQpvEGY0K6zdJApbATjcTeWJy3CO4DissjUr+TL8GeuBh1rUdNP8BXk+p6RX6TvT+at5X4NPQS/nI61q79JbFc9rOL0nMrsvwJR34vHg36rNkaGVg3NOtsgbSkOMsP7DjBNFKogtTSfJli8rk15Qa8F1SabyUZmk2KUcIprbKJ7soqMujs7L4tvhnqovuin7o8etnk9RoLPU0lcuXgxk1GyAAYaYAGI5tJEUJgJksrwSAifBRPgaCwQW+CXwQIQ0JgRIxPkySMUiDn9S1EaqJJnmLuqyhPtq087JeMI6vWe96nHKaOfHGnXqTfbFcs1BihrOp2/wD9WFcX/qZsx/WPmyuP7GOjVy1c3KMeypcSfMh21wsfzSePszbK3ZNLD1Vbf/KskRutlLEZyl/+hl0ukjJ57FFL/J0Y+lTwss1Eacf1sVmNLl+djJC/VJfztPCH4nkzu2c/ODHKtz5lkqaT+vrhLFnymX1a7V8s0/3NSdK/0p/k1p6Xfug+1/YsqN6aismulm014zur2m+5e7M9D75NkpGxghmR8GN+ThXWINXXrOjs90jbaMF8e6icfsIrztcXjgx3ww+42KccDur7onRGCixG7XJPlnKw6ptGeu7wwOpCfzG/RNbbrg4sbdzcquwluwmnaSUiXBPwYqbMrkzJ5A07KWpZQV7SNtx7ng17K3CWUixG9p3jyba3XJoaeXCZuRl8rNIzKKsi4PyasU65OuXMePwZY2YY9TiSjatsbMu0Tc4y00654xJYZ8Ovh6Wpur/0zkv8s+w6nU4qljlI+Vdaq9Lqd3tJ5RBl+G9MtV8QaSD+mM++X4W59B1k567Wx09XCZ4/4Qpav1GpUe5xioR/LPovTtEtLF3WRzbNbv2LIrZoor02mjRD+n6mvLM0M4JUXvkzQr25KwIlkpYMkFkBAm88F4WeCUsMoUjGZJYI2AxTWZoJcFywRywIxsXFbFdpSWIgCeDn9Vs7dO17m/8Ag4vVrVKyEE+CVY1aFnZ8HPr0n6PX2RTWM5X7nT06NG6edba2/sSLWxOW2xl09ksYyakW3F7malSWXk0jq138G3CzJyITa5ZvUT7mgN7KaE0h9r7RKrue4DU1gMdzLjSkh9qiEQo4WGz0HSH/ALpj2PPSTW53ujNvSt+MmculjpgIDDbGIeNhYOa7ITQxMLE4FgoQECY2JgSSymSyBEsbJAiRjaLkSByOrRhCHqywklyeZ31slZKT9POyR0fjHWunT+hW/nmuDS0lbr0tUHyorJYM8W5R7YrCRlrrSeZeBLEFlMXe2+TSNz1Mr5VgUc8ye5grlg2FJNbmpWVplGPOPwVF5LsPtTyYpR8GZEySZU01ZwyYu2VbbibvpuXCE6MJ9zwFa8L8vEtmZMp8E2U1/wCpmHLrT7ZZRzsalZmRJZjj3Jjcn9WzLzlGdNPNNelqpw22kzZUcxyYuqQ9PXd2PqWdjLRYnDDNxGlqaXJ5Wcmo04s7U6lLg1LdLlYWwTbXhau1ZNuuxOvZrKNGVEothTY4yayFd/SXZwm0dCuWx53T2fOdimzZZYZb0X8yKmlLkwwsWeSrLF6eU90UXFYMsZNeTk29R9PbkwS6u1whvSzG3p2nao7t4KeqhLTyg5J5RwHqdVqF8mIk+lqpfVPb7Gfux0nBlV23bSjLx9zxnXaZW3xnCLb42R7JaKycW8Z+7J0/TFqtTGtpYTzL8EnJvpq8Opuq+BujSq6StTfHDnY3FNco9VY1KWPYuPbXTGqqKjXFdsYrwiVDG/k7x5r2uOGZO5RRjzgiU8eQjL3Fxswc+zVduUt2YXq7GB1XaClk5kNRJmzVY5Lco2ZNt7MnyTkMhDe4lsS5JiUsvCAzIMrGCW+2LIhJylnIGSTUYNs8ze3ZqZyfueh1Dbg0vY4PZmx++SVYzaettHF1bdfUr4+0j02kpZwOv0/p+rOSW1kVL/sSLTpi+zLM0LMbGKMo+gmmZYwi1yaRl9WJlru7JJqRijTGSf2F+kck8SaYHoKNTG2HjJmPPVR1NH0vODeo6hLu7bYYYHV7klwYpTCLU1yDjJLOE19gFGeXvwej6XKD0qUGvueabT8NHT6Pa4ajsztJcEy6I9AAAc20iZWCWc1TgReCAFgkslhYgTKZJBDJZbJYEPghlslgQ+CPBb4I4A8T1ymV3X/m3isGZRSb+x1uraB2X16mK3isM5M8xzksGPu7nzsMmK2YJ7mhmi9jJGww5TWwJ74YRtwlkvOODWjPBljNNliM3cVFLyYkw7pPbwaGeVkUsR5MTjOx5bwOMUvyErlFAR6UV9T/ALmGydccpRyE7nZLtjuZK9FOxZzh/cDn2JyfyrLfGDZ0+j1EYudjxHHB0a6KdOs4TfuzV1epX0x2RNDSu0VeqeZruwa70Ndf0ZR06X8hMtN3NtvYDmKqS43MUlvujq+illIxy0qecoDkyqTzsaVtGG2juz0TNa3RzSeFkDkVyddqTOlHUJRy2jQ1DlRFydcv7HOlrZWt9mfwFd2XUVHyYZdUztnb8nIjG2znJtVaFy+abZjLLTphhcumz6vrrbfxkzU6ZKSbWWXTRGC7YRwjfpqit3ycMuS17OPhmPbLptPl54SOhXp4vwa8E48GeN0oo5urPKqFVbx7GrpYRpzJ4zLya+v6h6KlOUZdkY5bR5Gfxdfbd21VZintlno4p8vLz34fRarottOSyi53QW2Vk8J0/rM9bqZRm5QsispLyjtU2WTn9Umz1S7eGzTveqnvkw2TctkYa4NL5nkuK754QRnq0sZRy+WK7TKK2NuGIxMdkl7gacaseDNBKKJc1nYTm3wUZu9A28GKvLe5l7W+AIXczPXHsWWi4wUVloxTtzsgiLJOUtuDJCKgssUI53Ksa4QGvKXdL7Gl6P8APe3k3nHCMcY5uJVbemrwkcb4v0n+6UauK/4cuyX4fD/ueipWEVqtNXrNHZp7I5jOLRmK+aU6jtXa5bG3Xq1F8mhrNNboNXZp7VJSg9vuvcwKZvaPU6K2Ntijnk6jq9NbYPE0321TUoTaa4OxT1mcl23Vv8xA7qcntsRNNv8ABo19QoljMpQf/NsbtdkJ/TOMv3Ay0xnLltGw6be3MZsmFrrX/Db/AAX+rlJYjU8/cBwdyXzxyjodPrb1MZLwc+E7JP5lg7nSOxt5+pEvRHXQAgObRiaGwOao4EymJhUCLaJAhksyNEkWMbRJkZDAxtEGRkMDG+CGWyGQY5xUotPg4HUdL2Scktj0EvJr30xug4vyJR5ZbZyTzwb2q0Uqm3jKNLtcc5NgUsFQlkhoFsBm8McG1wzGnuZI8FRsQl7ld6NZyB2OMctlGeVqSZqTnO2XbAXfK2WFwbelpjCSTWZMqMmi0riu57vzk3pXRrWOCZyVNeWcqy93WPGcFGa/UOecM1lW5vMtzLXXl5Zlm1FYAdUcIuQqnlDa3AhJclqGeSUssyZwgJlFY4Mbgm9zLnJj1FkaKJ3NZ7VnHuByus9Sq6XQv5Xq3S+mvj92eXn1aWrsk9RpKYvw6ljH59zodTqs1Gjp1Vz7rb5d3HCzwcWmiUtTZDPD9sE21J7drSad21qcVs+Dfjp3BLJn6bp/Q0sYPf7mxZBNtHjzytr6PHhJGpXHEl7G1XyYu3teDNBcGHRtVRzybEIJ8GvU8GeNqriVF2aWE4tNJ/sec13wlp53vUaV102Pdx/pZ6RXqUdjDOaltk1LYzcZe3iem9P1ej61KzVUNQimk08qR6RX1QWY7M3PQjJ7iloISe6R2x5tR58vpt3thjrot8mxp9XCMstr+5C6dDwiloUjX3/0z/F/beWtqs4kv7jc4z2yjnKhQkZVT3e5Zzfpm/S38t2NSz7lOCj9jQ9OcN1KX9zZolKSw3k3OWVzy+nyjJFGxWvIQr8hN9qOscEXWYWE9zBVFyY2u5mxVWlH2CHjtjgx43MkpZIYEz+kwpfPF/czS3Rilsl+QOnVwZomKjepMzLk51po9U6LpOr0dt8e2yK+W2P1RPn+p6bHTdSt0cpJzhjfHKPpt91enonbY8Qisyfsj51rtVVrusW6ytdsZ7L9tjWI1HpJwk8LKMsItYymb1Mk1vub1FdEp74yUcyuDs2UXL9je0mjtVieHFHWVMIr5Gv7GSMdiio2dkEsZYK+Ud5VvBUIrwbCUXHDWfyEYFZGfBvdPudWojvyaTqjF5gsGehfzYe5KR6pb7gKvPprIHNplwJrYoT4MCSWtyhEVIsFNCAjBOC2LAVjaIaMrRjaIu2JkMySMbAxshlslkGN+SXwWyH5CscoxlFppNGhf02E8uDwzo+CWNjzd2jtqzmLwa7TwepnFSWGso0bun1zy47M1KODmSfJkjbhbme/R2VvjY1XDCfuWJYzRkpCmu548GKDa2yZoyS3b2KmlRUaa3OWxWgsd2oc2/lRpanUK1qEXsZtJP0MxXkqN3W6jvs9OL/cx00rGXyTGKlJyfuZHYorAFuSga7crJ8bE97nLGTPCKhHLKHCxQkoszKaaOep992Uts+DYTaCtmKWMkvdkq3CwwjJMIpZz9jQ6ndmp1J7YyzpbKHd4OJqU7Kpz9+DGV1HXjx3Wt8QQVOj6bVt9Gd3jbJzel36CMrYarSW2Wyn/Ltrtwo/t5O18Z29/Uun6XCXo6WvhZznfg8xp1jXKOebF4x59ifBr+z2tdeI+QlEzxgsNE9mWeV9GdNd1bgo4NpwSRicUmRVQ4KaysMmOw8lQmmuCVCWTYrw1uZeyPsVWtXzujOnnwUq0skWNxhmPIiMsXsEmsHHvv6tKTVFNPb7ybRgdXXLfq1FEP8A0xyUdabjn6kCtjHmSOP/ALO6o/r1+H7KsF0Ky2WbNZbNmkdSzV1Jf8SLfsmVp9UpyxHG5z49AjW8+rNmzT0+NMtpy2LGL+nchNKvkxTllmPTwk4Y7h4alh8nrwylfP5MLjfa4RyzK5YWArjhcCazI25HFbCksIyJYRjnwERjKyYpR3My+klgb2mX8lGdGrpJ5rx7G0jFajm/EjcegavHLrx/k+cVZX2Pp/VqP1PStTU3jMHufN6YqSWeS4jZ087c/LudGE3JJ8M0qKn3be51qq15SyUXVqLYrdZR0KJqyHdwYK6VhGzUu1YAyJ4M0XlGJJN7maGF5CIakn9jf6ZT6lvc/BpSl4Ol0iX82SF6Ha4AAObTMIfAjARJZONgJYsFYE0RUk4KwAGNohmVoxyQ0rBIxsyyMUiKhkPktkMgh+Sfcp+SfAVDJLZDW4EtEGRkAY5RTW6yaV+ijNNxSTZvPghjY4N2ntpk127e5qTlJ7Hp5RTXg0btDCbco7M1KOHCv590bUcJjt086t+1te5iaeCyppm9XCwuSW5PfJiin3bmZYWMmjTLXiPJF2obfbEx2WrdRIhB8sJpnpRnW5hi0lyWpAVJ4eAhzknKZSWN0Bh6pq1pdA2n885KEf3MVkoy01UY/wBTSwczr2o9Tq2g0edt7Jf9jahL/eKYt7OSOWXb0cXTW+JdT+p+JbLYZxW4Vxw8N4XuanTOnrVauVv6qmpwsz6Vs/ne+f3Ohr9PRqNFrNTXh2wvxLuWU0vscDSNf7Vh2uL/AJix2rb9smp05/8AT3yfuLyU1s2Y28M8te+U3LwRJPGw3JEOYXZ1fMOWzKpwmZGk2FYo2diKV3d5CdLa2MddclLBRtQbaKjH3IipcF5xyyoyKMQ7YrwYJamqCzKyC/8A2Rh/XRee1poslS2M1s8PAQmjWds7HskXCE2t1g3MLXPLkxndbbtio8o1vV+d7GWGmUlmUm/3M8KK4cJG5xVyv1GLFTa0sI2oR7uRKEc7JGdR7YnfDDxebk5LmG1GLMUX8zYS/IR2NuSmyHwOT2F4CJXIPbcM/MKW6YGbRtRta9zoRRyKJ9l0cnXjukZsajl/Eeoel6FqHHKlNKC/f/6Pn1ScfB7f4wljoy/9yKPG1STxsJ0N/RPulhnXhtg5mkcFNNs68VFpYeSjNXwZ45MMIs2ILbcC4xyV2tDS2LXARg3ydXo6/nSOZ5Z0+kPF7X2Jeh2wADDTOyShGEIADwFSIokBYE0UIipZikZWYpcBWCRikZZGKXLIqGQ+S3wR5AlrkhrYt+SX5IIJZTJYVOCGZDGwIfBLRfghgQyC3ySQYnFPOfJrXaOMlmOz+5tsljY5MqJ1t5Rhnng7Mkn4ME9PGzPuamQ5MYtyLstS7Y+Tl9S6lf0rUuu3T91b+mxPkNJ1KnXxzBtSXKka2adZPL5K7jWjLHG5kjYnsyozxkZozWDW8bFLdL8hHiuodQX/AOaWWTl8lbVf4WDuu2ErK5Qmmsprc8R1Oxz61rZefWl/1JplbXOMoTaaeeRcNt4cnj6eonZP9ao+pNRldulLBhrUo9UjN5z6ud3l8+Way1rnbGzt3ym0vJsUau9WRn2JR7s8DWppJl7e9y+0nK9zT03UK9TUmnh+V5Mykm/seWx78bueltx8MXan5MclvswjJoy0y7x8BG3D3MldsXtIyqmuccryVSrui1yWnFvY1ZaWUZNp7GSqEoclg2njGcmPs9TLlx7B3LG5ranWw09MpuWMfYukt0ep+CFZpf1ico5+bkx19DqrrWLJRePB3ND8bUavpz0aozLs7M+DmXalvGODpfTjhd721l0+2P8Aw78/kpUa6HmEjNXqPm3NlaqCjh4HlkvhjWhF66L+ZR/Y26p3yfzJZFLUwy0itPau9sszyZvHj+GzX3PZ7GSUmo8kKaa7uDHK3Mmj1Y9PDn6vpa3DuwY3PC2EpIrDK2C4MTluVHLXID8hPZhxtyxuLkssDWm2pprd54O7RJTqi/scZxSZ1Ony7qcexKscj4vqc+kQfiNqb/yeOrqTie4+K5qHQbM8ynFL+54qjMopEnSstdTWO3J0tHKcbYpttfcmml9hkjHsln2KOxHHJkWTT093c8NnRVfy5CJTeDLH6WYlFl+AIfJ0ek/+I/Y5x0ek/wDiP2Jeh3QBgYaZxFEmEIAABCGIKQnwMHwFQzFMyS4MMyLGCXLMbMkjGyKgnyUS+QJfkkpkkEPgTRbIYVLMbMjIAh8EMt8EMCGQzI+TGyKT4IZXgkCSPJbIYRq67Q09Q0sqLls+H5i/c81qfh2WgSs0Vjk+JRlt+6Z67waWse2Cwcmt2Qrj3xw8bmbZpDclvlbCi4vhm0jJGTXJmhJOSNfJSkVK+e63Ty/23rY+FfL/AKmzRpO9pM9P1Lp1V1vfWlC6Sy34kc6Ojuqmoyqkt+cbf3OuLnVaLp0IwlJrLNtaVKKMtCbkoJbcm0q/sLGo0YVzqlmGToafUtRxYOFOeUjKqFjg5ZYSumHJcWaN8XwZEk0aqp32Zk7ZRW0jjeKvTOfG9sj7lF4ZVOpcZbs0rtTKqO+5iq1XquXbthboz4V0nJjXo4298M5JS7jh6bqlTeIXRf2ydOnWQl/UiOkrYt085Vtxe6OPKEsuOohLHg79Wqra3awOyVFvhZNY5aZyx24mnhp6nmGEzZzB/wBRsvQaezftx+DDPpFTf1v+50mccft5T5VGqGM5/wAgtPGT5f8AcUOmRh9M5f3NmFEqX8zbRvG41z5Mc8ZvZR0la3kslJQreIpGbwQ1hPbJ2kjzXLK/JObwzEs9zeDKq5Sj5RkrpSe+5WWFQlIyRpZs9qQIIw+i1wVGtLnkyMEgIawx4+QqSEuANeS9jd6bL64o1ZbF6Kzs1fb4lsKrn/G9zhoNNVn67c/2R5jRrODufxAs7I9PX/PL/ocTpbUmsokHcpwoFuKkKMUkNvAUlB1yys7G9ptX3LEtn9zTUlLyZIVPOV4COopZRWDBVntwZc4QES5Oj0j/AMQzmnT6Ov50iXodwAAw22BABhlIAACEUyfIUhMYmFY5PYwzM0uDBIhGGRDLkQ+CNIZLKZLAT4ILfBHuBLJZTJZFSyC2QBDJZTJYEMhlsgioEyvBIEESRfklhEvg0dW09jcm8RbObbLukyyDSsWzMbzFbGxNJmNxNomuzOzMyZijD2KimngqVltrV9Kl/VDgxL1Oxwk8x9jao+mWeGHb8zNxnTFDTxjuo7mb0yo7MyDYUIfYpx2LhwOWMAQohJLDDvS8mOyxYeArna1vOPGBdGjGetnCXEoMu6t2vbkjRRlpuo1za2ezyTSvL6/T29I6ndROt7vMJY2lHxgjRy1+p1Ua9NK5yb3jHOx9L1Whp1tcVbCMnDeOVnA9JTVp3KKqjGUuZJYyPCU+5Z00adHbXRGMrG5JbvJS01/dmMtvydV154wTCtxk8ov28VnNlGrGOoisNlJ3t47f3NrCzujJGK9ifai/yM2tX63dl7GxiUn8zMnakuBrBqYSMZcuWXaXUmsFQrUVsjJtgaaNsBR+XgSii+7bkxuSywi3wQHdsSBT4FkPAgCW6JXJXglLcCZrY1JWOqyE+MSRvyjlHK6jmNFjXiOQOZ/EK5PUdMgn/TOf/Q5GhscUmmc3VX6jqNsZ2yc/SXbHL4RtaSbikmnsRXoYajZZZu1wVuHk5FKdrSij0GkrVdSzzgKquiMXwjNGKSwiVvnBSyEZoYCbIT2KxkoS4Ot0dbyZy4rbB3umVenp8+5nLojeAAMNtkQAYZSAAAMQAFIlgAVikYJABCMLIYARpDEwABPggAAlkvgAIqSAACHwSwACXyQwAio8EgAEPklgARgueIHNnzkAN4jF/Uw7fcAKi4wXgp1gBUZIQ2BxeQA2hxTyVwABB6mEY535WEwAKx+p7kfNPgAA2tNp3nLW5j6lSq4KyPjcACOtorldpa7FxJGacVNbPcANRkV29jUJv9zYxGSymAFGOUcMWcAAQd+wKf2ACjKpYQlJgAFZ2IAAMiTwLG4AA0thZQAAZ2EtmAANtnB+IdTHTdNsk3vLZAAHj+jqOoVj/wCY7VOhj3ZQAFdjSUQqXCbN2GX+AAgyxxBMTsAAHGxFu32QAUVGUso9NoJd2liwAzkRsgAGG3//2Q==" alt="Dr. Vittorio Penzo - Psicologo">
+                    <img src="foto.jpg" alt="Dr. Vittorio Penzo - Psicologo">
                 </div>
             </div>
             <div class="about-content">
                 <h2>Chi Sono</h2>
                 <p>Sono il <strong>Dr. Vittorio Penzo</strong>, psicologo specializzato in <strong>terapia cognitivo-comportamentale</strong>. La mia missione è accompagnarti in un percorso di crescita e benessere psicologico.</p>
-                
                 <p>Credo fortemente nell'importanza di creare uno spazio sicuro, empatico e non giudicante dove poter esplorare le proprie difficoltà e risorse personali.</p>
-                
                 <h3 style="font-size: 1.5rem; color: var(--primary); margin: 2rem 0 1rem;">Il Mio Approccio</h3>
                 <ul class="about-list">
                     <li>Terapia Cognitivo-Comportamentale (CBT)</li>
@@ -902,13 +258,11 @@
                     <li>Obiettivi concreti e misurabili</li>
                     <li>Collaborazione attiva con il paziente</li>
                 </ul>
-                
                 <a href="prenota.html" class="btn-primary" style="margin-top: 1.5rem;">Prenota un Colloquio</a>
             </div>
         </div>
     </section>
 
-    <!-- Pricing -->
     <section class="pricing" id="prezzi">
         <div class="section-header">
             <div class="section-tag">Tariffe</div>
@@ -919,24 +273,23 @@
             <div class="pricing-card">
                 <div class="pricing-icon">👤</div>
                 <h3>Seduta Individuale</h3>
-                <p class="pricing-duration">Online • 50 minuti</p>
-                <div class="pricing-price">€65</div>
+                <p class="pricing-duration">Online • <span class="duration-individual">50</span> minuti</p>
+                <div class="pricing-price price-individual">€65</div>
                 <p class="pricing-period">a seduta</p>
                 <ul class="pricing-features">
                     <li>Consulenza psicologica individuale</li>
                     <li>Approccio cognitivo-comportamentale</li>
                     <li>Piattaforma sicura e privata</li>
-                    <li>Orari flessibili Lun-Ven 14-19</li>
+                    <li>Orari flessibili <span class="days-display">Lun-Ven</span> <span class="hours-display">14-19</span></li>
                     <li>Prenotazione online immediata</li>
                 </ul>
                 <a href="prenota.html" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Prenota Ora</a>
             </div>
-            
             <div class="pricing-card">
                 <div class="pricing-icon">👥</div>
                 <h3>Seduta di Coppia</h3>
-                <p class="pricing-duration">Online • 50 minuti</p>
-                <div class="pricing-price">€75</div>
+                <p class="pricing-duration">Online • <span class="duration-couple">50</span> minuti</p>
+                <div class="pricing-price price-couple">€75</div>
                 <p class="pricing-period">a seduta</p>
                 <ul class="pricing-features">
                     <li>Terapia di coppia online</li>
@@ -950,7 +303,6 @@
         </div>
     </section>
 
-    <!-- CTA -->
     <section class="cta">
         <div class="cta-container">
             <h2>Pronto per iniziare il tuo percorso?</h2>
@@ -959,13 +311,12 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-container">
             <div class="footer-section">
                 <h3>Dr. Vittorio Penzo</h3>
                 <p>Psicologo specializzato in terapia cognitivo-comportamentale</p>
-                <p>Sedute online dal lunedì al venerdì, 14:00 - 19:00</p>
+                <p>Sedute online <span class="days-display">Lun-Ven</span>, <span class="hours-full">14:00-19:00</span></p>
             </div>
             <div class="footer-section">
                 <h3>Link Utili</h3>
@@ -977,8 +328,8 @@
             </div>
             <div class="footer-section">
                 <h3>Contatti</h3>
-                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e4928d90908b968d94818a9e8bca94978da48389858d88ca878b89">[email&#160;protected]</a></p>
-                <p>Disponibilità: Lun-Ven 14:00-19:00</p>
+                <p>Email: vittoriopenzo94@gmail.com</p>
+                <p>Disponibilità: <span class="days-display">Lun-Ven</span> <span class="hours-full">14:00-19:00</span></p>
                 <p>Modalità: Solo online</p>
             </div>
         </div>
@@ -987,23 +338,14 @@
         </div>
     </footer>
 
-    <!-- Admin Access Button -->
-    <button id="adminBtn" style="position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none; box-shadow: 0 4px 12px rgba(44, 95, 115, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; transition: all 0.3s; z-index: 999;" onclick="openAdminModal()">
-        ⚙️
-    </button>
+    <button id="adminBtn" style="position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none; box-shadow: 0 4px 12px rgba(44,95,115,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; transition: all 0.3s; z-index: 999;" onclick="openAdminModal()">⚙️</button>
 
-    <!-- Admin Login Modal -->
-    <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 3rem; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+    <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 3rem; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
             <h2 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">🔐 Accesso Admin</h2>
             <p style="text-align: center; color: #6B7280; margin-bottom: 2rem;">Inserisci la password per accedere al pannello di gestione</p>
-            
-            <div id="adminError" style="display: none; background: #FEE2E2; color: #DC2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; text-align: center;">
-                Password errata. Riprova.
-            </div>
-            
+            <div id="adminError" style="display: none; background: #FEE2E2; color: #DC2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; text-align: center;">Password errata. Riprova.</div>
             <input type="password" id="adminPassword" placeholder="Password" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;" onkeypress="if(event.key==='Enter') checkAdminPassword()">
-            
             <div style="display: flex; gap: 1rem;">
                 <button onclick="closeAdminModal()" style="flex: 1; padding: 0.875rem; background: #F3F4F6; color: #374151; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Annulla</button>
                 <button onclick="checkAdminPassword()" style="flex: 1; padding: 0.875rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Accedi</button>
@@ -1011,49 +353,31 @@
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        const ADMIN_PASSWORD = 'vittorio2024';
-        
-        function openAdminModal() {
-            document.getElementById('adminModal').style.display = 'flex';
-            document.getElementById('adminPassword').focus();
-        }
-        
-        function closeAdminModal() {
-            document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminError').style.display = 'none';
-        }
-        
+    <script>
+        function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; document.getElementById('adminPassword').focus(); }
+        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; document.getElementById('adminPassword').value = ''; document.getElementById('adminError').style.display = 'none'; }
         function checkAdminPassword() {
             const password = document.getElementById('adminPassword').value;
-            if (password === ADMIN_PASSWORD) {
-                window.location.href = 'admin.html';
-            } else {
-                document.getElementById('adminError').style.display = 'block';
-                document.getElementById('adminPassword').value = '';
-            }
+            const savedPwd = localStorage.getItem('penzo_admin_password') || 'vittorio2024';
+            if (password === savedPwd) { window.location.href = 'prenota.html'; }
+            else { document.getElementById('adminError').style.display = 'block'; document.getElementById('adminPassword').value = ''; }
         }
-        
-        // Close modal on outside click
-        document.getElementById('adminModal').addEventListener('click', (e) => {
-            if (e.target.id === 'adminModal') {
-                closeAdminModal();
-            }
-        });
-    
-        // Smooth scroll
+        document.getElementById('adminModal').addEventListener('click', (e) => { if (e.target.id === 'adminModal') closeAdminModal(); });
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (!href || href === '#') return;
+                const target = document.querySelector(href);
                 if (target) {
+                    e.preventDefault();
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
-
-        // Navbar shadow on scroll
         window.addEventListener('scroll', () => {
             const nav = document.querySelector('nav');
-            if (window.scrollY 
+            nav.style.boxShadow = window.scrollY > 50 ? '0 4px 30px rgba(44,95,115,0.15)' : '0 2px 20px rgba(44,95,115,0.08)';
+        });
+    </script>
+</body>
+</html>

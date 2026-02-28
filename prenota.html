@@ -12,372 +12,1475 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dr. Vittorio Penzo - Psicologo Online</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script>
-      firebase.initializeApp({
-        apiKey: "AIzaSyCP7chEuq2htBxi9jMNlFwAatSDndKyV6w",
-        authDomain: "vittoriopenzopsi-8bafd.firebaseapp.com",
-        databaseURL: "https://vittoriopenzopsi-8bafd-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "vittoriopenzopsi-8bafd",
-        storageBucket: "vittoriopenzopsi-8bafd.firebasestorage.app",
-        messagingSenderId: "843610290485",
-        appId: "1:843610290485:web:48f21f1b665e979a3ab47c"
-      });
-      firebase.database().ref('settings').on('value', function(snap) {
-        const s = snap.val();
-        if (!s) return;
-        // Prezzi
-        document.querySelectorAll('.price-individual').forEach(el => el.textContent = '€' + s.priceIndividual);
-        document.querySelectorAll('.price-couple').forEach(el => el.textContent = '€' + s.priceCouple);
-        // Durate
-        document.querySelectorAll('.duration-individual').forEach(el => el.textContent = s.durationIndividual);
-        document.querySelectorAll('.duration-couple').forEach(el => el.textContent = s.durationCouple);
-        // Stat durata
-        document.querySelectorAll('.duration-stat').forEach(el => el.textContent = s.durationIndividual + "'");
-        // Orari
-        const start = String(s.scheduleStart).padStart(2,'0');
-        const end = String(s.scheduleEnd).padStart(2,'0');
-        document.querySelectorAll('.hours-display').forEach(el => el.textContent = start + '-' + end);
-        document.querySelectorAll('.hours-full').forEach(el => el.textContent = start + ':00-' + end + ':00');
-        // Giorni
-        const dayNames = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-        const days = s.availableDays || [1,2,3,4,5];
-        const sorted = [...days].sort((a,b)=>a-b);
-        const daysStr = sorted.map(d => dayNames[d]).join('-');
-        document.querySelectorAll('.days-display').forEach(el => el.textContent = daysStr);
-      });
+    <title>Prenota Appuntamento - Dr. Vittorio Penzo</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init("k2sQv1pISznfvgfvN");
+        })();
     </script>
-
-    <style>
-        :root {
-            --primary: #2C5F73;
-            --primary-light: #4A7C8F;
-            --secondary: #D4A574;
-            --accent: #E8B894;
-            --text-dark: #1A2F3A;
-            --text-light: #5A6C76;
-            --bg-light: #F8F9FA;
-            --white: #FFFFFF;
-            --shadow: rgba(44, 95, 115, 0.08);
-            --shadow-strong: rgba(44, 95, 115, 0.15);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Jost', sans-serif; color: var(--text-dark); line-height: 1.7; background: var(--white); overflow-x: hidden; }
-        h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; font-weight: 600; line-height: 1.2; }
-        nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 1000; padding: 1.5rem 0; box-shadow: 0 2px 20px var(--shadow); animation: slideDown 0.6s ease-out; }
-        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .nav-container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--primary); }
-        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 24px; box-shadow: 0 4px 12px var(--shadow); }
-        .logo-text h1 { font-size: 1.4rem; color: var(--primary); margin: 0; }
-        .logo-text p { font-size: 0.85rem; color: var(--text-light); margin: 0; }
-        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; position: relative; transition: color 0.3s; }
-        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--secondary); transition: width 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
-        .nav-links a:hover::after { width: 100%; }
-        .btn-prenota-nav { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white) !important; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; transition: all 0.3s; box-shadow: 0 4px 12px var(--shadow); }
-        .btn-prenota-nav::after { display: none; }
-        .btn-prenota-nav:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow-strong); }
-        .hero { margin-top: 90px; min-height: 90vh; display: flex; align-items: center; background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%); position: relative; overflow: hidden; }
-        .hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 80%; height: 200%; background: radial-gradient(circle, rgba(212,165,116,0.08) 0%, transparent 70%); animation: float 20s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(-30px,30px) rotate(5deg); } }
-        .hero-container { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 1; }
-        .hero-content { animation: fadeInLeft 0.8s ease-out 0.2s both; }
-        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
-        .hero-content h1 { font-size: 3.5rem; color: var(--primary); margin-bottom: 1.5rem; line-height: 1.1; }
-        .hero-content h1 span { color: var(--secondary); }
-        .hero-subtitle { font-size: 1.3rem; color: var(--text-light); margin-bottom: 2rem; font-weight: 300; }
-        .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white); padding: 1rem 2.5rem; border-radius: 10px; text-decoration: none; font-weight: 500; font-size: 1.1rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s; box-shadow: 0 6px 20px var(--shadow); }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px var(--shadow-strong); }
-        .btn-secondary { background: var(--white); color: var(--primary); padding: 1rem 2.5rem; border-radius: 10px; text-decoration: none; font-weight: 500; font-size: 1.1rem; border: 2px solid var(--primary); transition: all 0.3s; }
-        .btn-secondary:hover { background: var(--primary); color: var(--white); }
-        .hero-visual { position: relative; animation: fadeInRight 0.8s ease-out 0.4s both; }
-        @keyframes fadeInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-        .brain-icon { width: 100%; max-width: 400px; height: 400px; margin: 0 auto; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 180px; color: rgba(255,255,255,0.9); box-shadow: 0 20px 60px var(--shadow-strong); animation: pulse 3s ease-in-out infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .stats { background: var(--white); padding: 3rem 2rem; box-shadow: 0 -4px 20px var(--shadow); }
-        .stats-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; text-align: center; }
-        .stat-item { animation: fadeInUp 0.6s ease-out both; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .stat-number { font-size: 3rem; font-weight: 700; color: var(--primary); font-family: 'Cormorant Garamond', serif; }
-        .stat-label { font-size: 1rem; color: var(--text-light); margin-top: 0.5rem; }
-        .services { padding: 6rem 2rem; background: var(--bg-light); }
-        .section-header { max-width: 800px; margin: 0 auto 4rem; text-align: center; }
-        .section-tag { color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 1rem; }
-        .section-title { font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem; }
-        .section-description { font-size: 1.2rem; color: var(--text-light); line-height: 1.8; }
-        .services-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
-        .service-card { background: var(--white); padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 20px var(--shadow); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
-        .service-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), var(--secondary)); transform: scaleX(0); transition: transform 0.4s; }
-        .service-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px var(--shadow-strong); }
-        .service-card:hover::before { transform: scaleX(1); }
-        .service-icon { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary-light), var(--secondary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 1.5rem; box-shadow: 0 4px 12px var(--shadow); }
-        .service-card h3 { font-size: 1.6rem; color: var(--primary); margin-bottom: 1rem; }
-        .service-card p { color: var(--text-light); line-height: 1.7; }
-        .about { padding: 6rem 2rem; background: var(--white); }
-        .about-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-        .about-img-wrapper { width: 100%; height: 600px; border-radius: 20px; box-shadow: 0 20px 60px var(--shadow-strong); position: relative; overflow: hidden; background: var(--bg-light); display: flex; align-items: center; justify-content: center; }
-        .about-img-wrapper img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
-        .about-content h2 { font-size: 2.8rem; color: var(--primary); margin-bottom: 2rem; }
-        .about-content p { font-size: 1.1rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.8; }
-        .about-list { list-style: none; margin: 2rem 0; }
-        .about-list li { padding: 0.8rem 0; padding-left: 2rem; position: relative; color: var(--text-dark); font-size: 1.05rem; }
-        .about-list li::before { content: '✓'; position: absolute; left: 0; color: var(--secondary); font-weight: bold; font-size: 1.2rem; }
-        .pricing { padding: 6rem 2rem; background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%); }
-        .pricing-cards { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; }
-        .pricing-card { background: var(--white); padding: 3rem; border-radius: 20px; box-shadow: 0 8px 30px var(--shadow); text-align: center; transition: all 0.4s; position: relative; overflow: hidden; }
-        .pricing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
-        .pricing-card:hover { transform: scale(1.05); box-shadow: 0 12px 40px var(--shadow-strong); }
-        .pricing-icon { font-size: 60px; margin-bottom: 1.5rem; }
-        .pricing-card h3 { font-size: 1.8rem; color: var(--primary); margin-bottom: 1rem; }
-        .pricing-duration { color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.95rem; }
-        .pricing-price { font-size: 3.5rem; color: var(--primary); font-weight: 700; font-family: 'Cormorant Garamond', serif; margin-bottom: 0.5rem; }
-        .pricing-period { color: var(--text-light); font-size: 1rem; margin-bottom: 2rem; }
-        .pricing-features { list-style: none; margin: 2rem 0; text-align: left; }
-        .pricing-features li { padding: 0.7rem 0; padding-left: 2rem; position: relative; color: var(--text-dark); }
-        .pricing-features li::before { content: '✓'; position: absolute; left: 0; color: var(--secondary); font-weight: bold; }
-        .cta { padding: 6rem 2rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--white); text-align: center; position: relative; overflow: hidden; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .cta::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); animation: rotate 20s linear infinite; }
-        .cta-container { max-width: 800px; margin: 0 auto; position: relative; z-index: 1; }
-        .cta h2 { font-size: 3rem; margin-bottom: 1.5rem; color: var(--white); }
-        .cta p { font-size: 1.3rem; margin-bottom: 2.5rem; opacity: 0.95; }
-        .btn-white { background: var(--white); color: var(--primary); padding: 1.2rem 3rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 1.2rem; display: inline-block; transition: all 0.3s; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .btn-white:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
-        footer { background: var(--text-dark); color: var(--white); padding: 3rem 2rem 1.5rem; }
-        .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 2rem; }
-        .footer-section h3 { font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--secondary); }
-        .footer-section p, .footer-section a { color: rgba(255,255,255,0.8); line-height: 1.8; text-decoration: none; display: block; margin-bottom: 0.5rem; transition: color 0.3s; }
-        .footer-section a:hover { color: var(--secondary); }
-        .footer-bottom { max-width: 1200px; margin: 2rem auto 0; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: rgba(255,255,255,0.6); }
-        .mobile-menu-btn { display: none; background: none; border: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
-        @media (max-width: 968px) { .nav-links { display: none; } .mobile-menu-btn { display: block; } .hero-container, .about-container { grid-template-columns: 1fr; gap: 3rem; } .hero-content h1 { font-size: 2.5rem; } .section-title { font-size: 2.2rem; } .brain-icon { max-width: 300px; height: 300px; font-size: 120px; } }
-        @media (max-width: 640px) { .hero-cta { flex-direction: column; } .btn-primary, .btn-secondary { width: 100%; justify-content: center; } .pricing-cards { grid-template-columns: 1fr; } }
-    </style>
 </head>
 <body>
-    <nav>
-        <div class="nav-container">
-            <a href="#home" class="logo">
-                <div class="logo-icon">🧠</div>
-                <div class="logo-text">
-                    <h1>Dr. Vittorio Penzo</h1>
-                    <p>Psicologo Online</p>
+    <div id="root"></div>
+
+    <script type="text/babel">
+const { useState, useEffect } = React;
+
+// Icone SVG
+const Calendar = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/>
+    <line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+  </svg>
+);
+
+const Clock = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10"/>
+    <polyline points="12 6 12 12 16 14"/>
+  </svg>
+);
+
+const User = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+
+const Users = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
+const X = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <line x1="18" y1="6" x2="6" y2="18"/>
+    <line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+
+const Check = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+const ChevronLeft = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <polyline points="15 18 9 12 15 6"/>
+  </svg>
+);
+
+const ChevronRight = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <polyline points="9 18 15 12 9 6"/>
+  </svg>
+);
+
+const Edit = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+  </svg>
+);
+
+const Lock = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+
+const Download = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </svg>
+);
+
+const FileText = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/>
+    <line x1="16" y1="17" x2="8" y2="17"/>
+    <polyline points="10 9 9 9 8 9"/>
+  </svg>
+);
+
+const MessageCircle = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+);
+
+const Star = ({ className = "w-6 h-6", filled = false }) => (
+  <svg className={className} fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
+);
+
+const Video = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <polygon points="23 7 16 12 23 17 23 7"/>
+    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+  </svg>
+);
+
+// Configurazione servizi
+const SERVICES = {
+  individual: {
+    name: 'Seduta Individuale Online',
+    duration: 50,
+    price: 65,
+    icon: User
+  },
+  couple: {
+    name: 'Seduta di Coppia Online',
+    duration: 50,
+    price: 75,
+    icon: Users
+  }
+};
+
+// Piattaforme disponibili
+const PLATFORMS = {
+  zoom: { name: 'Zoom', icon: Video },
+  meet: { name: 'Google Meet', icon: Video },
+  skype: { name: 'Skype', icon: Video }
+};
+
+// FAQ
+const FAQ_DATA = [
+  {
+    question: "Come funziona una seduta online?",
+    answer: "Le sedute online si svolgono tramite videochiamata sulla piattaforma di tua scelta (Zoom, Google Meet o Skype). Riceverai il link di accesso via email 24 ore prima dell'appuntamento. La qualità terapeutica è identica a quella di una seduta in presenza."
+  },
+  {
+    question: "Ho bisogno di particolari attrezzature?",
+    answer: "Ti serve solo un dispositivo (computer, tablet o smartphone) con webcam, microfono e connessione internet stabile. Assicurati di essere in un luogo tranquillo e riservato durante la seduta."
+  },
+  {
+    question: "Posso cancellare o spostare un appuntamento?",
+    answer: "Sì, puoi cancellare o modificare l'appuntamento con almeno 24 ore di anticipo. Per cancellazioni o modifiche urgenti, contatta direttamente il professionista."
+  },
+  {
+    question: "Come avviene il pagamento?",
+    answer: "Il pagamento viene effettuato dopo la seduta tramite bonifico bancario. Riceverai la fattura via email con le coordinate per il pagamento."
+  },
+  {
+    question: "Le sedute online sono confidenziali?",
+    answer: "Assolutamente sì. Viene garantito lo stesso livello di riservatezza delle sedute in presenza. Le piattaforme utilizzate sono sicure e conformi al GDPR."
+  },
+  {
+    question: "Quanto dura una seduta?",
+    answer: "Ogni seduta dura 50 minuti. È importante presentarsi puntuali all'orario concordato per sfruttare al meglio il tempo a disposizione."
+  }
+];
+
+// Testimonianze
+const TESTIMONIALS = [
+  {
+    name: "Maria G.",
+    rating: 5,
+    text: "Grazie alla terapia online ho potuto continuare il mio percorso anche durante periodi di viaggio. Il Dr. Penzo è molto professionale e la modalità online non toglie nulla all'efficacia delle sedute.",
+    date: "Gennaio 2025"
+  },
+  {
+    name: "Luca R.",
+    rating: 5,
+    text: "Ero scettico all'inizio sulle sedute online, ma mi sono ricreduto. La comodità di poter fare terapia da casa, senza perdere tempo in spostamenti, è impagabile. Consigliatissimo!",
+    date: "Dicembre 2024"
+  },
+  {
+    name: "Sofia M.",
+    rating: 5,
+    text: "Per me che vivo lontano da Parma, la terapia online è stata una benedizione. Il Dr. Penzo è empatico e competente, mi sono sentita ascoltata fin dalla prima seduta.",
+    date: "Novembre 2024"
+  }
+];
+
+// Password per area professionista
+const ADMIN_PASSWORD = "vittorio2024";
+
+// Storage nel localStorage 
+const STORAGE_KEY = 'penzo_appointments';
+const BLOCKED_SLOTS_KEY = 'penzo_blocked_slots';
+const PASSWORD_KEY = 'penzo_admin_password';
+
+// Funzioni utility
+const formatDate = (date) => {
+  return date.toISOString().split('T')[0];
+};
+
+const formatDisplayDate = (dateStr) => {
+  const date = new Date(dateStr + 'T00:00:00');
+  return date.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+};
+
+const generateTimeSlots = () => {
+  const slots = [];
+  for (let hour = 14; hour < 19; hour++) {
+    slots.push(`${hour.toString().padStart(2, '0')}:00`);
+    if (hour < 18) {
+      slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+  }
+  return slots;
+};
+
+// ✅ REGOLA 24H - Verifica se la data è entro 24 ore
+const isWithin24Hours = (date) => {
+  const now = new Date();
+  const selectedDateTime = new Date(date);
+  selectedDateTime.setHours(23, 59, 59, 999);
+  const diffInHours = (selectedDateTime - now) / (1000 * 60 * 60);
+  return diffInHours < 24;
+};
+
+// ✅ REGOLA 24H - Verifica se un appuntamento può essere cancellato
+const canCancelAppointment = (appointmentDate, appointmentTime) => {
+  const now = new Date();
+  const appointmentDateTime = new Date(appointmentDate + 'T' + appointmentTime);
+  const diffInHours = (appointmentDateTime - now) / (1000 * 60 * 60);
+  return diffInHours >= 24;
+};
+
+// ✅ EMAIL CORRETTA - Funzione per inviare email
+const sendEmailNotification = async (appointmentData) => {
+  try {
+    const platformName = PLATFORMS[appointmentData.platform]?.name || 'Non specificata';
+    
+    const templateParams = {
+      name: appointmentData.patientName,  // ✅ PARAMETRO RICHIESTO DAL TEMPLATE
+      patient_name: appointmentData.patientName,
+      patient_email: appointmentData.patientEmail,
+      patient_phone: appointmentData.patientPhone,
+      service_type: appointmentData.serviceType === 'individual' ? 'Seduta Individuale' : 'Seduta di Coppia',
+      appointment_date: formatDisplayDate(appointmentData.date),
+      appointment_time: appointmentData.time,
+      price: appointmentData.price,
+      platform: platformName
+    };
+
+    const result = await emailjs.send('service_jo0kg0d', 'template_vttk3n', templateParams);
+    console.log('✅ Email inviata con successo:', result);
+    return true;
+  } catch (error) {
+    console.error('❌ Errore invio email:', error);
+    return false;
+  }
+};
+
+// ✅ ESPORTA EXCEL - Esporta appuntamenti in CSV
+const exportToCSV = (appointments) => {
+  const headers = ['Data', 'Orario', 'Paziente', 'Email', 'Telefono', 'Servizio', 'Piattaforma', 'Prezzo'];
+  const rows = appointments.map(apt => [
+    apt.date,
+    apt.time,
+    apt.patientName,
+    apt.patientEmail,
+    apt.patientPhone,
+    apt.serviceName,
+    PLATFORMS[apt.platform]?.name || 'N/D',
+    `€${apt.price}`
+  ]);
+  
+  let csvContent = headers.join(',') + '\n';
+  rows.forEach(row => {
+    csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+  });
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `appuntamenti_${new Date().toISOString().split('T')[0]}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+// Componente principale
+function AppointmentSystem() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [appointments, setAppointments] = useState([]);
+  const [blockedSlots, setBlockedSlots] = useState([]);
+  
+  const [selectedService, setSelectedService] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+  
+  const [patientName, setPatientName] = useState('');
+  const [patientEmail, setPatientEmail] = useState('');
+  const [patientPhone, setPatientPhone] = useState('');
+  const [consentAccepted, setConsentAccepted] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState(null);
+  const [showBlockSlotModal, setShowBlockSlotModal] = useState(false);
+  const [blockSlotDate, setBlockSlotDate] = useState('');
+  const [blockSlotTime, setBlockSlotTime] = useState('');
+  const [blockSlotReason, setBlockSlotReason] = useState('');
+  
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [showTestimonials, setShowTestimonials] = useState(false);
+  const [expandedFAQ, setExpandedFAQ] = useState(null);
+
+  useEffect(() => {
+    const savedAppointments = localStorage.getItem(STORAGE_KEY);
+    const savedBlockedSlots = localStorage.getItem(BLOCKED_SLOTS_KEY);
+    const savedPassword = localStorage.getItem(PASSWORD_KEY);
+    
+    if (savedAppointments) {
+      setAppointments(JSON.parse(savedAppointments));
+    }
+    if (savedBlockedSlots) {
+      setBlockedSlots(JSON.parse(savedBlockedSlots));
+    }
+    if (!savedPassword) {
+      localStorage.setItem(PASSWORD_KEY, ADMIN_PASSWORD);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+  }, [appointments]);
+
+  useEffect(() => {
+    localStorage.setItem(BLOCKED_SLOTS_KEY, JSON.stringify(blockedSlots));
+  }, [blockedSlots]);
+
+  const getWeekDays = (startDate) => {
+    const days = [];
+    const current = new Date(startDate);
+    for (let i = 0; i < 7; i++) {
+      days.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    return days;
+  };
+
+  const nextWeek = () => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() + 7);
+    setCurrentWeekStart(newDate);
+  };
+
+  const prevWeek = () => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() - 7);
+    setCurrentWeekStart(newDate);
+  };
+
+  const isSlotBlocked = (date, time) => {
+    return blockedSlots.some(
+      slot => slot.date === formatDate(date) && slot.time === time
+    );
+  };
+
+  const isSlotBooked = (date, time) => {
+    return appointments.some(
+      apt => apt.date === formatDate(date) && apt.time === time
+    );
+  };
+
+  const timeToMinutes = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  const isSlotOccupiedByDuration = (date, time) => {
+    const dateStr = formatDate(date);
+    const slotMinutes = timeToMinutes(time);
+    
+    return appointments.some(apt => {
+      if (apt.date !== dateStr) return false;
+      
+      const aptStartMinutes = timeToMinutes(apt.time);
+      const aptEndMinutes = aptStartMinutes + 50;
+      const slotEndMinutes = slotMinutes + 50;
+      
+      return (
+        (slotMinutes >= aptStartMinutes && slotMinutes < aptEndMinutes) ||
+        (slotEndMinutes > aptStartMinutes && slotEndMinutes <= aptEndMinutes) ||
+        (slotMinutes <= aptStartMinutes && slotEndMinutes >= aptEndMinutes)
+      );
+    });
+  };
+
+  const getAvailableSlots = (date) => {
+    const dateStr = formatDate(date);
+    const allSlots = generateTimeSlots();
+    
+    return allSlots.map(time => {
+      const blocked = isSlotBlocked(date, time);
+      const booked = isSlotBooked(date, time);
+      const occupiedByDuration = isSlotOccupiedByDuration(date, time);
+      
+      return {
+        time,
+        available: !blocked && !booked && !occupiedByDuration,
+        blocked,
+        booked: booked || occupiedByDuration
+      };
+    });
+  };
+
+  const handleLogin = () => {
+    const savedPassword = localStorage.getItem(PASSWORD_KEY) || ADMIN_PASSWORD;
+    if (passwordInput === savedPassword) {
+      setIsAdmin(true);
+      setShowPasswordModal(false);
+      setPasswordInput('');
+    } else {
+      alert('Password errata');
+    }
+  };
+
+  const handleChangePassword = () => {
+    if (newPassword !== confirmPassword) {
+      alert('Le password non coincidono');
+      return;
+    }
+    if (newPassword.length < 8) {
+      alert('La password deve essere di almeno 8 caratteri');
+      return;
+    }
+    
+    localStorage.setItem(PASSWORD_KEY, newPassword);
+    alert('✅ Password cambiata con successo!');
+    setShowChangePasswordModal(false);
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  const bookAppointment = async () => {
+    if (!selectedService || !selectedDate || !selectedTime || !patientName || !patientEmail || !patientPhone || !selectedPlatform) {
+      alert('Compila tutti i campi per prenotare');
+      return;
+    }
+
+    if (!consentAccepted) {
+      alert('⚠️ Devi accettare il consenso informato per procedere con la prenotazione.');
+      return;
+    }
+
+    if (isSlotBooked(selectedDate, selectedTime) || 
+        isSlotBlocked(selectedDate, selectedTime) || 
+        isSlotOccupiedByDuration(selectedDate, selectedTime)) {
+      alert('Questo slot non è più disponibile.');
+      return;
+    }
+
+    const newAppointment = {
+      id: Date.now(),
+      date: formatDate(selectedDate),
+      time: selectedTime,
+      serviceType: selectedService,
+      serviceName: SERVICES[selectedService].name,
+      price: SERVICES[selectedService].price,
+      platform: selectedPlatform,
+      patientName,
+      patientEmail,
+      patientPhone,
+      status: 'confirmed',
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedAppointments = [...appointments, newAppointment];
+    setAppointments(updatedAppointments);
+    
+    const emailSent = await sendEmailNotification(newAppointment);
+    
+    setShowConfirmation(true);
+    
+    setTimeout(() => {
+      setSelectedService(null);
+      setSelectedDate(new Date());
+      setSelectedTime(null);
+      setSelectedPlatform(null);
+      setPatientName('');
+      setPatientEmail('');
+      setPatientPhone('');
+      setConsentAccepted(false);
+      setShowConfirmation(false);
+    }, 5000);
+  };
+
+  const deleteAppointment = (id) => {
+    const appointment = appointments.find(apt => apt.id === id);
+    
+    if (!canCancelAppointment(appointment.date, appointment.time)) {
+      if (confirm('⚠️ Questo appuntamento è tra meno di 24 ore.\n\nLe cancellazioni devono essere effettuate con almeno 24 ore di anticipo.\n\nVuoi procedere comunque con la cancellazione? (Contatteremo il paziente)')) {
+        setAppointments(appointments.filter(apt => apt.id !== id));
+        alert('✅ Appuntamento cancellato. Ricordati di contattare il paziente.');
+      }
+      return;
+    }
+    
+    if (confirm('Sei sicuro di voler cancellare questo appuntamento?')) {
+      setAppointments(appointments.filter(apt => apt.id !== id));
+      alert('✅ Appuntamento cancellato con successo.');
+    }
+  };
+
+  const startEditAppointment = (appointment) => {
+    setEditingAppointment(appointment);
+    setSelectedDate(new Date(appointment.date + 'T00:00:00'));
+    setSelectedTime(appointment.time);
+  };
+
+  const saveEditAppointment = () => {
+    if (!selectedTime) {
+      alert('Seleziona un nuovo orario');
+      return;
+    }
+
+    const updatedAppointments = appointments.map(apt => 
+      apt.id === editingAppointment.id 
+        ? { ...apt, date: formatDate(selectedDate), time: selectedTime }
+        : apt
+    );
+    
+    setAppointments(updatedAppointments);
+    setEditingAppointment(null);
+    setSelectedTime(null);
+    alert('✅ Appuntamento modificato. Ricordati di avvisare il paziente.');
+  };
+
+  const blockTimeSlot = () => {
+    if (!blockSlotDate || !blockSlotTime) {
+      alert('Seleziona data e orario');
+      return;
+    }
+
+    const newBlockedSlot = {
+      id: Date.now(),
+      date: blockSlotDate,
+      time: blockSlotTime,
+      reason: blockSlotReason || 'Impegno personale'
+    };
+
+    setBlockedSlots([...blockedSlots, newBlockedSlot]);
+    setShowBlockSlotModal(false);
+    setBlockSlotDate('');
+    setBlockSlotTime('');
+    setBlockSlotReason('');
+  };
+
+  const unblockTimeSlot = (id) => {
+    if (confirm('Vuoi sbloccare questo slot?')) {
+      setBlockedSlots(blockedSlots.filter(slot => slot.id !== id));
+    }
+  };
+
+  // Vista Paziente
+  const PatientView = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Dr. Vittorio Penzo</h1>
+        <p className="text-gray-600">Psicologo - Sedute Online</p>
+        
+        <div className="flex gap-3 justify-center mt-4">
+          <button
+            onClick={() => setShowFAQ(!showFAQ)}
+            className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center gap-2 text-sm"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Domande Frequenti
+          </button>
+          <button
+            onClick={() => setShowTestimonials(!showTestimonials)}
+            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center gap-2 text-sm"
+          >
+            <Star className="w-4 h-4" />
+            Testimonianze
+          </button>
+        </div>
+      </div>
+
+      {showFAQ && (
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <MessageCircle className="w-6 h-6 text-blue-600" />
+              Domande Frequenti
+            </h3>
+            <button onClick={() => setShowFAQ(false)} className="text-gray-500 hover:text-gray-700">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="space-y-3">
+            {FAQ_DATA.map((faq, idx) => (
+              <div key={idx} className="bg-white rounded-lg border border-blue-200">
+                <button
+                  onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
+                  className="w-full text-left p-4 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg flex items-center justify-between"
+                >
+                  {faq.question}
+                  <span className="text-blue-600">{expandedFAQ === idx ? '−' : '+'}</span>
+                </button>
+                {expandedFAQ === idx && (
+                  <div className="px-4 pb-4 text-gray-600 text-sm">
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showTestimonials && (
+        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <Star className="w-6 h-6 text-green-600" filled />
+              Cosa dicono i pazienti
+            </h3>
+            <button onClick={() => setShowTestimonials(false)} className="text-gray-500 hover:text-gray-700">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="space-y-4">
+            {TESTIMONIALS.map((testimonial, idx) => (
+              <div key={idx} className="bg-white rounded-lg p-4 border border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-yellow-500" filled />
+                  ))}
                 </div>
-            </a>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#servizi">Servizi</a></li>
-                <li><a href="#chi-sono">Chi Sono</a></li>
-                <li><a href="#prezzi">Prezzi</a></li>
-                <li><a href="prenota.html" class="btn-prenota-nav">Prenota Seduta</a></li>
-            </ul>
-            <button class="mobile-menu-btn">☰</button>
-        </div>
-    </nav>
-
-    <section class="hero" id="home">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>Benvenuto nel tuo <span>spazio di ascolto</span></h1>
-                <p class="hero-subtitle">Supporto psicologico online professionale con approccio cognitivo-comportamentale</p>
-                <div class="hero-cta">
-                    <a href="prenota.html" class="btn-primary">📅 Prenota una Seduta</a>
-                    <a href="#chi-sono" class="btn-secondary">Scopri di più</a>
+                <p className="text-gray-700 mb-2 italic">"{testimonial.text}"</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-semibold text-gray-800">{testimonial.name}</span>
+                  <span className="text-gray-500">{testimonial.date}</span>
                 </div>
-            </div>
-            <div class="hero-visual">
-                <div class="brain-icon">🧠</div>
-            </div>
+              </div>
+            ))}
+          </div>
         </div>
-    </section>
+      )}
 
-    <section class="stats">
-        <div class="stats-container">
-            <div class="stat-item">
-                <div class="stat-number">100%</div>
-                <div class="stat-label">Online</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number duration-stat">50'</div>
-                <div class="stat-label">Durata Seduta</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number hours-display">14-19</div>
-                <div class="stat-label">Orario (<span class="days-display">Lun-Ven</span>)</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number">24h</div>
-                <div class="stat-label">Risposta Prenotazioni</div>
-            </div>
-        </div>
-    </section>
-
-    <section class="services" id="servizi">
-        <div class="section-header">
-            <div class="section-tag">Aree di Intervento</div>
-            <h2 class="section-title">Come posso aiutarti</h2>
-            <p class="section-description">Offro supporto psicologico specializzato in diverse aree, utilizzando l'approccio cognitivo-comportamentale</p>
-        </div>
-        <div class="services-grid">
-            <div class="service-card"><div class="service-icon">😰</div><h3>Ansia e Disturbi d'Ansia</h3><p>Gestione dell'ansia generalizzata, attacchi di panico, fobie e preoccupazioni eccessive attraverso tecniche evidence-based.</p></div>
-            <div class="service-card"><div class="service-icon">🌧️</div><h3>Depressione</h3><p>Supporto per stati depressivi, umore basso, perdita di interesse e difficoltà emotive con un approccio terapeutico strutturato.</p></div>
-            <div class="service-card"><div class="service-icon">💑</div><h3>Problemi di Coppia</h3><p>Terapia di coppia per migliorare la comunicazione, risolvere conflitti e rafforzare il legame affettivo.</p></div>
-            <div class="service-card"><div class="service-icon">🌱</div><h3>Crescita Personale</h3><p>Percorsi di sviluppo personale, autostima, consapevolezza di sé e raggiungimento degli obiettivi di vita.</p></div>
-            <div class="service-card"><div class="service-icon">👨‍👩‍👧</div><h3>Supporto Genitoriale</h3><p>Consulenza per genitori su gestione dei figli, educazione, difficoltà relazionali e sfide della genitorialità.</p></div>
-            <div class="service-card"><div class="service-icon">🕊️</div><h3>Elaborazione del Lutto</h3><p>Accompagnamento nel processo di elaborazione delle perdite e nella gestione del dolore emotivo.</p></div>
-            <div class="service-card"><div class="service-icon">⚡</div><h3>Gestione dello Stress</h3><p>Tecniche per gestire lo stress quotidiano, burnout lavorativo e trovare un equilibrio vita-lavoro.</p></div>
-        </div>
-    </section>
-
-    <section class="about" id="chi-sono">
-        <div class="about-container">
-            <div class="about-image">
-                <div class="about-img-wrapper">
-                    <img src="foto.jpg" alt="Dr. Vittorio Penzo - Psicologo">
+      <div>
+        <label className="block text-lg font-semibold text-gray-700 mb-4">
+          1. Seleziona il tipo di seduta
+        </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {Object.entries(SERVICES).map(([key, service]) => {
+            const Icon = service.icon;
+            return (
+              <div
+                key={key}
+                onClick={() => {
+                  setSelectedService(key);
+                  setSelectedTime(null);
+                }}
+                className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                  selectedService === key
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 text-lg mb-1">{service.name}</h3>
+                    <p className="text-sm text-gray-600 mb-2">{service.duration} minuti</p>
+                    <p className="text-2xl font-bold text-blue-600">€{service.price}</p>
+                  </div>
                 </div>
-            </div>
-            <div class="about-content">
-                <h2>Chi Sono</h2>
-                <p>Sono il <strong>Dr. Vittorio Penzo</strong>, psicologo specializzato in <strong>terapia cognitivo-comportamentale</strong>. La mia missione è accompagnarti in un percorso di crescita e benessere psicologico.</p>
-                <p>Credo fortemente nell'importanza di creare uno spazio sicuro, empatico e non giudicante dove poter esplorare le proprie difficoltà e risorse personali.</p>
-                <h3 style="font-size: 1.5rem; color: var(--primary); margin: 2rem 0 1rem;">Il Mio Approccio</h3>
-                <ul class="about-list">
-                    <li>Terapia Cognitivo-Comportamentale (CBT)</li>
-                    <li>Approccio evidence-based e scientificamente validato</li>
-                    <li>Flessibilità e personalizzazione del percorso terapeutico</li>
-                    <li>Obiettivi concreti e misurabili</li>
-                    <li>Collaborazione attiva con il paziente</li>
-                </ul>
-                <a href="prenota.html" class="btn-primary" style="margin-top: 1.5rem;">Prenota un Colloquio</a>
-            </div>
+              </div>
+            );
+          })}
         </div>
-    </section>
+      </div>
 
-    <section class="pricing" id="prezzi">
-        <div class="section-header">
-            <div class="section-tag">Tariffe</div>
-            <h2 class="section-title">Prezzi Trasparenti</h2>
-            <p class="section-description">Tariffe chiare e competitive per sedute online di alta qualità</p>
-        </div>
-        <div class="pricing-cards">
-            <div class="pricing-card">
-                <div class="pricing-icon">👤</div>
-                <h3>Seduta Individuale</h3>
-                <p class="pricing-duration">Online • <span class="duration-individual">50</span> minuti</p>
-                <div class="pricing-price price-individual">€65</div>
-                <p class="pricing-period">a seduta</p>
-                <ul class="pricing-features">
-                    <li>Consulenza psicologica individuale</li>
-                    <li>Approccio cognitivo-comportamentale</li>
-                    <li>Piattaforma sicura e privata</li>
-                    <li>Orari flessibili <span class="days-display">Lun-Ven</span> <span class="hours-display">14-19</span></li>
-                    <li>Prenotazione online immediata</li>
-                </ul>
-                <a href="prenota.html" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Prenota Ora</a>
+      {selectedService && (
+        <>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700 mb-4">
+              2. Scegli la piattaforma per la videochiamata
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {Object.entries(PLATFORMS).map(([key, platform]) => {
+                const Icon = platform.icon;
+                return (
+                  <div
+                    key={key}
+                    onClick={() => setSelectedPlatform(key)}
+                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                      selectedPlatform === key
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Icon className="w-8 h-8 text-green-600" />
+                      <span className="font-semibold text-gray-800">{platform.name}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div class="pricing-card">
-                <div class="pricing-icon">👥</div>
-                <h3>Seduta di Coppia</h3>
-                <p class="pricing-duration">Online • <span class="duration-couple">50</span> minuti</p>
-                <div class="pricing-price price-couple">€75</div>
-                <p class="pricing-period">a seduta</p>
-                <ul class="pricing-features">
-                    <li>Terapia di coppia online</li>
-                    <li>Entrambi i partner coinvolti</li>
-                    <li>Miglioramento comunicazione</li>
-                    <li>Risoluzione conflitti</li>
-                    <li>Rafforzamento del legame</li>
-                </ul>
-                <a href="prenota.html" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Prenota Ora</a>
-            </div>
-        </div>
-    </section>
+            <p className="text-xs text-gray-500 mt-2">
+              Riceverai il link per la videochiamata via email 24 ore prima dell'appuntamento
+            </p>
+          </div>
 
-    <section class="cta">
-        <div class="cta-container">
-            <h2>Pronto per iniziare il tuo percorso?</h2>
-            <p>Prenota la tua prima seduta oggi stesso. Il primo passo verso il benessere inizia qui.</p>
-            <a href="prenota.html" class="btn-white">📅 Prenota la Tua Seduta</a>
-        </div>
-    </section>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700 mb-4">
+              3. Seleziona la data
+            </label>
+            <div className="bg-white border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <button onClick={prevWeek} className="p-2 hover:bg-gray-100 rounded">
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <h3 className="font-semibold text-lg">
+                  {currentWeekStart.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}
+                </h3>
+                <button onClick={nextWeek} className="p-2 hover:bg-gray-100 rounded">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-7 gap-2">
+                {getWeekDays(currentWeekStart).map((day, idx) => {
+                  const dateStr = formatDate(day);
+                  const slots = getAvailableSlots(day);
+                  const availableCount = slots.filter(s => s.available).length;
+                  const isSelected = formatDate(selectedDate) === dateStr;
+                  const isPast = day < new Date().setHours(0, 0, 0, 0);
+                  const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                  const within24h = isWithin24Hours(day);
+                  
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => {
+                        if (!isPast && !isWeekend && availableCount > 0) {
+                          if (within24h) {
+                            alert('⚠️ Le prenotazioni devono essere effettuate con almeno 24 ore di anticipo.');
+                            return;
+                          }
+                          setSelectedDate(day);
+                          setSelectedTime(null);
+                        }
+                      }}
+                      className={`p-3 text-center rounded-lg cursor-pointer transition-all ${
+                        isPast || isWeekend || within24h
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : isSelected
+                          ? 'bg-blue-500 text-white'
+                          : availableCount > 0
+                          ? 'border-2 border-gray-200 hover:border-blue-300'
+                          : 'border border-gray-200 text-gray-400'
+                      }`}
+                    >
+                      <div className="text-xs font-medium">
+                        {day.toLocaleDateString('it-IT', { weekday: 'short' })}
+                      </div>
+                      <div className="text-lg font-bold mt-1">
+                        {day.getDate()}
+                      </div>
+                      {within24h && !isPast && (
+                        <div className="text-xs mt-1 text-red-500">
+                          &lt;24h
+                        </div>
+                      )}
+                      {availableCount > 0 && !isPast && !isWeekend && !within24h && (
+                        <div className="text-xs mt-1">
+                          {availableCount} slot
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-3">
+                ⏰ <strong>Importante:</strong> Le prenotazioni richiedono almeno 24 ore di anticipo
+              </p>
+            </div>
+          </div>
 
-    <footer>
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>Dr. Vittorio Penzo</h3>
-                <p>Psicologo specializzato in terapia cognitivo-comportamentale</p>
-                <p>Sedute online <span class="days-display">Lun-Ven</span>, <span class="hours-full">14:00-19:00</span></p>
+          <div>
+            <label className="block text-lg font-semibold text-gray-700 mb-4">
+              4. Seleziona l'orario - {formatDisplayDate(formatDate(selectedDate))}
+            </label>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+              {getAvailableSlots(selectedDate).map(slot => (
+                <button
+                  key={slot.time}
+                  onClick={() => slot.available && setSelectedTime(slot.time)}
+                  disabled={!slot.available}
+                  className={`p-4 rounded-lg font-medium transition-all ${
+                    selectedTime === slot.time
+                      ? 'bg-blue-500 text-white'
+                      : slot.available
+                      ? 'bg-white border-2 border-gray-200 hover:border-blue-300 text-gray-700'
+                      : 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Clock className="w-5 h-5 mx-auto mb-1" />
+                  {slot.time}
+                  {!slot.available && (
+                    <div className="text-xs mt-1">
+                      {slot.blocked ? 'Non disp.' : 'Occupato'}
+                    </div>
+                  )}
+                </button>
+              ))}
             </div>
-            <div class="footer-section">
-                <h3>Link Utili</h3>
-                <a href="#home">Home</a>
-                <a href="#servizi">Servizi</a>
-                <a href="#chi-sono">Chi Sono</a>
-                <a href="#prezzi">Prezzi</a>
-                <a href="prenota.html">Prenota</a>
-            </div>
-            <div class="footer-section">
-                <h3>Contatti</h3>
-                <p>Email: vittoriopenzo94@gmail.com</p>
-                <p>Disponibilità: <span class="days-display">Lun-Ven</span> <span class="hours-full">14:00-19:00</span></p>
-                <p>Modalità: Solo online</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Dr. Vittorio Penzo - Psicologo. Tutti i diritti riservati. | <a href="admin.html" style="color: #6B7280; text-decoration: none; font-size: 0.85rem;">Admin</a></p>
-        </div>
-    </footer>
+            <p className="text-xs text-gray-500 mt-3">
+              💡 Le sedute durano 50 minuti. Gli slot vicini a prenotazioni esistenti potrebbero risultare non disponibili.
+            </p>
+          </div>
 
-    <button id="adminBtn" style="position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none; box-shadow: 0 4px 12px rgba(44,95,115,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; transition: all 0.3s; z-index: 999;" onclick="openAdminModal()">⚙️</button>
+          {selectedTime && selectedPlatform && (
+            <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">5. I tuoi dati</h3>
+              <form onSubmit={(e) => e.preventDefault()}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nome e Cognome *
+                  </label>
+                  <input
+                    type="text"
+                    value={patientName}
+                    onChange={(e) => setPatientName(e.target.value)}
+                    autoComplete="off"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Mario Rossi"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    value={patientEmail}
+                    onChange={(e) => setPatientEmail(e.target.value)}
+                    autoComplete="off"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="mario.rossi@email.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefono *
+                  </label>
+                  <input
+                    type="tel"
+                    value={patientPhone}
+                    onChange={(e) => setPatientPhone(e.target.value)}
+                    autoComplete="off"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="+39 123 456 7890"
+                  />
+                </div>
 
-    <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
-        <div style="background: white; padding: 3rem; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <h2 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">🔐 Accesso Admin</h2>
-            <p style="text-align: center; color: #6B7280; margin-bottom: 2rem;">Inserisci la password per accedere al pannello di gestione</p>
-            <div id="adminError" style="display: none; background: #FEE2E2; color: #DC2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; text-align: center;">Password errata. Riprova.</div>
-            <input type="password" id="adminPassword" placeholder="Password" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;" onkeypress="if(event.key==='Enter') checkAdminPassword()">
-            <div style="display: flex; gap: 1rem;">
-                <button onclick="closeAdminModal()" style="flex: 1; padding: 0.875rem; background: #F3F4F6; color: #374151; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Annulla</button>
-                <button onclick="checkAdminPassword()" style="flex: 1; padding: 0.875rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Accedi</button>
+                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-800 mb-2">Consenso Informato Obbligatorio</h4>
+                      <p className="text-sm text-gray-700 mb-3">
+                        Prima di prenotare, è necessario leggere e accettare il consenso informato.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowConsentModal(true)}
+                        className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2 text-sm"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Leggi il Consenso Informato
+                      </button>
+                      
+                      <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={consentAccepted}
+                          onChange={(e) => setConsentAccepted(e.target.checked)}
+                          className="w-5 h-5 text-blue-600"
+                        />
+                        <span className="text-sm font-medium text-gray-800">
+                          Ho letto e accetto il consenso informato
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg border-2 border-blue-200">
+                  <h4 className="font-semibold text-gray-800 mb-3">Riepilogo Prenotazione</h4>
+                  <div className="space-y-2 text-sm">
+                    <p><strong>Servizio:</strong> {SERVICES[selectedService].name}</p>
+                    <p><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform].name}</p>
+                    <p><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
+                    <p><strong>Orario:</strong> {selectedTime}</p>
+                    <p><strong>Durata:</strong> {SERVICES[selectedService].duration} minuti</p>
+                    <p className="text-lg font-bold text-blue-600 pt-2">
+                      Costo: €{SERVICES[selectedService].price}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={bookAppointment}
+                  disabled={!consentAccepted}
+                  className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${
+                    consentAccepted
+                      ? 'bg-blue-500 text-white hover:bg-blue-600'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  <Check className="w-6 h-6" />
+                  Conferma Prenotazione
+                </button>
+
+                <p className="text-xs text-gray-500 text-center">
+                  Riceverai un'email di conferma con il link per la videochiamata
+                </p>
+              </div>
+              </form>
             </div>
+          )}
+        </>
+      )}
+{showConsentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-bold text-gray-800">Consenso Informato</h3>
+              <button onClick={() => setShowConsentModal(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
+              <p className="font-semibold">Dr. Vittorio Penzo - Psicologo</p>
+              <p>Borgo Pace 5, Parma</p>
+              <p>C.F. PNZVTR94A13D086W - P.I. 03729090781</p>
+              <p>Albo Psicologi: 10513A PR</p>
+              
+              <h4 className="font-bold text-lg mt-6">Informazioni sulla prestazione professionale</h4>
+              
+              <p><strong>Tipo di prestazione:</strong> Colloquio psicologico online</p>
+              
+              <p><strong>Finalità:</strong> La prestazione è finalizzata ad attività professionali di promozione e tutela della salute e del benessere.</p>
+              
+              <p><strong>Strumenti utilizzati:</strong> Colloquio clinico, questionari, test (se necessario).</p>
+              
+              <p><strong>Durata:</strong> La durata globale dell'intervento non è definibile a priori. Obiettivi e tempi saranno comunicati e concordati verbalmente durante il percorso.</p>
+              
+              <h4 className="font-bold text-lg mt-6">Diritti del paziente</h4>
+              
+              <ul className="list-disc pl-6 space-y-2">
+                <li>È possibile interrompere il rapporto in qualsiasi momento comunicando al professionista la volontà di interruzione.</li>
+                <li>Il professionista può proporre l'interruzione quando constata che non vi sia alcun beneficio dall'intervento.</li>
+                <li>In caso di mancato rispetto dell'appuntamento senza preavviso di almeno 24 ore, il paziente si impegna a saldare comunque il corrispettivo previsto.</li>
+              </ul>
+              
+              <h4 className="font-bold text-lg mt-6">Tariffe</h4>
+              
+              <p><strong>Seduta individuale online:</strong> €65 (sessantacinque) + ENPAP 2%</p>
+              <p><strong>Seduta di coppia online:</strong> €75 (settantacinque) + ENPAP 2%</p>
+              
+              <p className="text-sm italic">Il compenso non può essere condizionato all'esito o ai risultati dell'intervento professionale.</p>
+              
+              <h4 className="font-bold text-lg mt-6">Modalità di pagamento</h4>
+              
+              <p>Il pagamento dovrà avvenire entro una settimana dalla ricezione della fattura tramite bonifico bancario.</p>
+              <p className="text-sm">Per detrarre la spesa, il pagamento deve avvenire tramite modalità tracciabile (no contanti).</p>
+              
+              <h4 className="font-bold text-lg mt-6">Trattamento dei dati personali (GDPR)</h4>
+              
+              <p>Il Dr. Vittorio Penzo è Titolare del trattamento dei dati personali raccolti, che includono:</p>
+              
+              <ul className="list-disc pl-6 space-y-2">
+                <li>Dati anagrafici, di contatto e di pagamento</li>
+                <li>Dati relativi allo stato di salute fisica o mentale</li>
+              </ul>
+              
+              <p>I dati saranno:</p>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>Trattati con modalità cartacee ed elettroniche</li>
+                <li>Protetti con adeguate misure di sicurezza</li>
+                <li>Conservati per il tempo necessario (minimo 5 anni per dati sanitari)</li>
+                <li>Resi accessibili solo su richiesta delle Autorità competenti o con consenso esplicito del paziente</li>
+              </ul>
+              
+              <h4 className="font-bold text-lg mt-6">Diritti dell'interessato</h4>
+              
+              <p>L'interessato può esercitare i diritti di accesso, rettifica, cancellazione, limitazione del trattamento e portabilità dei dati secondo quanto previsto dagli articoli 15-22 del GDPR.</p>
+              
+              <p className="mt-4 text-sm">Per reclami: Garante per la protezione dei dati personali - Piazza Venezia 11, 00187 Roma</p>
+              <p className="text-sm">Email: garante@gpdp.it - PEC: protocollo@pec.gpdp.it</p>
+            </div>
+            
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => {
+                  setConsentAccepted(true);
+                  setShowConsentModal(false);
+                }}
+                className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600"
+              >
+                Ho letto e accetto
+              </button>
+              <button
+                onClick={() => setShowConsentModal(false)}
+                className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300"
+              >
+                Chiudi
+              </button>
+            </div>
+          </div>
         </div>
+      )}
+
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="w-10 h-10 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-3">Prenotazione Confermata!</h3>
+            <p className="text-gray-600 mb-4">
+              Grazie {patientName}! Riceverai un'email di conferma a {patientEmail} con il link per la videochiamata su {PLATFORMS[selectedPlatform]?.name}.
+            </p>
+            <div className="bg-gray-50 p-4 rounded-lg text-left">
+              <p className="text-sm mb-1"><strong>Servizio:</strong> {SERVICES[selectedService]?.name}</p>
+              <p className="text-sm mb-1"><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform]?.name}</p>
+              <p className="text-sm mb-1"><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
+              <p className="text-sm mb-1"><strong>Orario:</strong> {selectedTime}</p>
+              <p className="text-sm font-bold text-blue-600 mt-2">€{SERVICES[selectedService]?.price}</p>
+            </div>
+            <p className="text-xs text-gray-500 mt-4">
+              📧 Riceverai un promemoria 24 ore prima dell'appuntamento
+            </p>
+          </div>
+        </div>
+      )}
     </div>
+  );
 
-    <script>
-        function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; document.getElementById('adminPassword').focus(); }
-        function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; document.getElementById('adminPassword').value = ''; document.getElementById('adminError').style.display = 'none'; }
-        function checkAdminPassword() {
-            const password = document.getElementById('adminPassword').value;
-            const savedPwd = localStorage.getItem('penzo_admin_password') || 'vittorio2024';
-            if (password === savedPwd) { window.location.href = 'prenota.html'; }
-            else { document.getElementById('adminError').style.display = 'block'; document.getElementById('adminPassword').value = ''; }
-        }
-        document.getElementById('adminModal').addEventListener('click', (e) => { if (e.target.id === 'adminModal') closeAdminModal(); });
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                if (!href || href === '#') return;
-                const target = document.querySelector(href);
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-        window.addEventListener('scroll', () => {
-            const nav = document.querySelector('nav');
-            nav.style.boxShadow = window.scrollY > 50 ? '0 4px 30px rgba(44,95,115,0.15)' : '0 2px 20px rgba(44,95,115,0.08)';
-        });
+  const ProfessionalView = () => {
+    const today = new Date();
+    const futureAppointments = appointments
+      .filter(apt => new Date(apt.date) >= today)
+      .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
+          <button
+            onClick={() => setIsAdmin(false)}
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+          >
+            Esci
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setShowBlockSlotModal(true)}
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2"
+          >
+            <Lock className="w-4 h-4" />
+            Blocca Slot
+          </button>
+          <button
+            onClick={() => exportToCSV(appointments)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Esporta in Excel
+          </button>
+          <button
+            onClick={() => setShowChangePasswordModal(true)}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center gap-2"
+          >
+            <Lock className="w-4 h-4" />
+            Cambia Password
+          </button>
+        </div>
+
+        {blockedSlots.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-gray-800 mb-3">Slot Bloccati ({blockedSlots.length})</h3>
+            <div className="space-y-2">
+              {blockedSlots.map(slot => (
+                <div key={slot.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{formatDisplayDate(slot.date)} - {slot.time}</p>
+                    <p className="text-sm text-gray-600">{slot.reason}</p>
+                  </div>
+                  <button
+                    onClick={() => unblockTimeSlot(slot.id)}
+                    className="p-2 text-red-500 hover:bg-red-50 rounded"
+                    title="Sblocca slot"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <h3 className="font-semibold text-gray-800 mb-3">
+            Prossimi Appuntamenti ({futureAppointments.length})
+          </h3>
+          <div className="space-y-3">
+            {futureAppointments.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <Calendar className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                <p className="text-gray-600">Nessun appuntamento in programma</p>
+              </div>
+            ) : (
+              futureAppointments.map(apt => {
+                const canCancel = canCancelAppointment(apt.date, apt.time);
+                return (
+                  <div key={apt.id} className={`bg-white border-2 rounded-lg p-4 ${!canCancel ? 'border-yellow-300' : 'border-gray-200'}`}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-800 text-lg">{apt.patientName}</h3>
+                            <p className="text-sm text-gray-600">{apt.patientEmail}</p>
+                            <p className="text-sm text-gray-600">{apt.patientPhone}</p>
+                          </div>
+                        </div>
+                        <div className="ml-15 space-y-1 bg-gray-50 p-3 rounded">
+                          <p className="text-sm"><strong>Servizio:</strong> {apt.serviceName}</p>
+                          <p className="text-sm"><strong>Piattaforma:</strong> {PLATFORMS[apt.platform]?.name || 'N/D'}</p>
+                          <p className="text-sm"><strong>Data:</strong> {formatDisplayDate(apt.date)}</p>
+                          <p className="text-sm"><strong>Orario:</strong> {apt.time}</p>
+                          <p className="text-sm font-bold text-blue-600">€{apt.price}</p>
+                          {!canCancel && (
+                            <p className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded mt-2">
+                              ⚠️ Appuntamento tra meno di 24 ore
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => startEditAppointment(apt)}
+                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"
+                          title="Modifica appuntamento"
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => deleteAppointment(apt.id)}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                          title="Cancella appuntamento"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {showChangePasswordModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold mb-4">Cambia Password</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nuova Password</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="Minimo 8 caratteri"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Conferma Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="Ripeti la password"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleChangePassword}
+                    className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                  >
+                    Cambia Password
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowChangePasswordModal(false);
+                      setNewPassword('');
+                      setConfirmPassword('');
+                    }}
+                    className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
+                  >
+                    Annulla
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {editingAppointment && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <h3 className="text-xl font-bold mb-4">Modifica Appuntamento</h3>
+              <p className="mb-4">Paziente: <strong>{editingAppointment.patientName}</strong></p>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Nuova Data</label>
+                <input
+                  type="date"
+                  value={formatDate(selectedDate)}
+                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Nuovo Orario</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {getAvailableSlots(selectedDate).map(slot => (
+                    <button
+                      key={slot.time}
+                      onClick={() => slot.available && setSelectedTime(slot.time)}
+                      disabled={!slot.available}
+                      className={`p-2 rounded ${
+                        selectedTime === slot.time
+                          ? 'bg-blue-500 text-white'
+                          : slot.available
+                          ? 'bg-gray-100 hover:bg-gray-200'
+                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      {slot.time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={saveEditAppointment}
+                  className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                >
+                  Salva Modifiche
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingAppointment(null);
+                    setSelectedTime(null);
+                  }}
+                  className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
+                >
+                  Annulla
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showBlockSlotModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold mb-4">Blocca Slot Orario</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Data</label>
+                  <input
+                    type="date"
+                    value={blockSlotDate}
+                    onChange={(e) => setBlockSlotDate(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Orario</label>
+                  <select
+                    value={blockSlotTime}
+                    onChange={(e) => setBlockSlotTime(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Seleziona orario</option>
+                    {generateTimeSlots().map(time => (
+                      <option key={time} value={time}>{time}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">Motivo (opzionale)</label>
+                  <input
+                    type="text"
+                    value={blockSlotReason}
+                    onChange={(e) => setBlockSlotReason(e.target.value)}
+                    placeholder="Es: Impegno personale"
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={blockTimeSlot}
+                    className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
+                  >
+                    Blocca Slot
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowBlockSlotModal(false);
+                      setBlockSlotDate('');
+                      setBlockSlotTime('');
+                      setBlockSlotReason('');
+                    }}
+                    className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
+                  >
+                    Annulla
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (!isAdmin && showPasswordModal) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
+            <p className="text-gray-600 mt-2">Inserisci la password per accedere</p>
+          </div>
+          
+          <input
+            type="password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+            className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="Password"
+          />
+          
+          <div className="flex gap-3">
+            <button
+              onClick={handleLogin}
+              className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600"
+            >
+              Accedi
+            </button>
+            <button
+              onClick={() => setShowPasswordModal(false)}
+              className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300"
+            >
+              Annulla
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 bg-blue-500 rounded-lg flex items-center justify-center">
+                <Calendar className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">Dr. Vittorio Penzo</h1>
+                <p className="text-sm text-gray-600">Psicologo - Prenotazione Online</p>
+              </div>
+            </div>
+            
+            {!isAdmin && (
+              <button
+                onClick={() => setShowPasswordModal(true)}
+                className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center gap-2 text-sm"
+              >
+                <Lock className="w-4 h-4" />
+                Area Professionista
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          {isAdmin ? <ProfessionalView /> : <PatientView />}
+        </div>
+
+        {!isAdmin && (
+          <div className="mt-6 text-center text-sm text-gray-600 bg-white rounded-lg p-4">
+            <p className="font-semibold mb-2">🔒 Privacy e Riservatezza</p>
+            <p>Le tue informazioni personali sono protette e utilizzate esclusivamente per la gestione degli appuntamenti</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<AppointmentSystem />, document.getElementById('root'));
     </script>
 </body>
 </html>

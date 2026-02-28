@@ -460,7 +460,7 @@ function AppointmentSystem() {
   };
 
   // ─── GESTIONE APPUNTAMENTI ───────────────────────────────────────────────────
-  const deleteAppointment = (id) => {
+  const deleteAppointment = async (id) => {
     const apt = appointments.find(a => a.id === id);
     if (!canCancelAppointment(apt.date, apt.time)) {
       if (confirm('⚠️ Questo appuntamento è tra meno di 24 ore.\nVuoi procedere comunque con la cancellazione?')) {
@@ -479,7 +479,7 @@ function AppointmentSystem() {
     setSelectedDate(new Date(apt.date + 'T00:00:00'));
     setSelectedTime(apt.time);
   };
-  const saveEditAppointment = () => {
+  const saveEditAppointment = async () => {
     if (!selectedTime) { alert('Seleziona un nuovo orario'); return; }
     await db.ref('appointments/' + editingAppointment.id).update({ date: formatDate(selectedDate), time: selectedTime });
     setEditingAppointment(null); setSelectedTime(null);
@@ -487,13 +487,13 @@ function AppointmentSystem() {
   };
 
   // ─── SLOT BLOCCO ─────────────────────────────────────────────────────────────
-  const blockTimeSlot = () => {
+  const blockTimeSlot = async () => {
     if (!blockSlotDate || !blockSlotTime) { alert('Seleziona data e orario'); return; }
     const newSlot = { id: Date.now(), date: blockSlotDate, time: blockSlotTime, reason: blockSlotReason || 'Impegno personale' };
     await db.ref('blockedSlots/' + newSlot.id).set(newSlot);
     setShowBlockSlotModal(false); setBlockSlotDate(''); setBlockSlotTime(''); setBlockSlotReason('');
   };
-  const unblockTimeSlot = (id) => { if (confirm('Vuoi sbloccare questo slot?')) { await db.ref('blockedSlots/' + id).remove(); } };
+  const unblockTimeSlot = async (id) => { if (confirm('Vuoi sbloccare questo slot?')) { await db.ref('blockedSlots/' + id).remove(); } };
 
   // ─── DOMANDE ANONIME ─────────────────────────────────────────────────────────
   const submitQuestion = async () => {
@@ -512,13 +512,13 @@ function AppointmentSystem() {
     setTimeout(() => setQuestionSent(false), 4000);
   };
 
-  const submitReply = (questionId) => {
+  const submitReply = async (questionId) => {
     if (!replyText.trim()) { alert('Scrivi una risposta'); return; }
     await db.ref('questions/' + questionId).update({ answer: replyText.trim(), answeredAt: new Date().toISOString() });
     setReplyingTo(null); setReplyText('');
   };
 
-  const deleteQuestion = (id) => {
+  const deleteQuestion = async (id) => {
     if (confirm('Eliminare questa domanda?')) { await db.ref('questions/' + id).remove(); }
   };
 

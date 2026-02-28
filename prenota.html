@@ -12,1271 +12,1048 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prenota Appuntamento - Dr. Vittorio Penzo</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Dr. Vittorio Penzo - Psicologo Online</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2C5F73;
+            --primary-light: #4A7C8F;
+            --secondary: #D4A574;
+            --accent: #E8B894;
+            --text-dark: #1A2F3A;
+            --text-light: #5A6C76;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --shadow: rgba(44, 95, 115, 0.08);
+            --shadow-strong: rgba(44, 95, 115, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.7;
+            background: var(--white);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 20px var(--shadow);
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .logo-text p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary);
+            transition: width 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .btn-prenota-nav {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white) !important;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        
+        .btn-prenota-nav::after {
+            display: none;
+        }
+        
+        .btn-prenota-nav:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-strong);
+        }
+        
+        /* Hero Section */
+        .hero {
+            margin-top: 90px;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 165, 116, 0.08) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-30px, 30px) rotate(5deg); }
+        }
+        
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            animation: fadeInLeft 0.8s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+        
+        .hero-content h1 span {
+            color: var(--secondary);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow-strong);
+        }
+        
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary);
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+        
+        .hero-visual {
+            position: relative;
+            animation: fadeInRight 0.8s ease-out 0.4s both;
+        }
+        
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .brain-icon {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 180px;
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 60px var(--shadow-strong);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: var(--white);
+            padding: 3rem 2rem;
+            box-shadow: 0 -4px 20px var(--shadow);
+        }
+        
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+        
+        .stat-item {
+            animation: fadeInUp 0.6s ease-out both;
+        }
+        
+        .stat-item:nth-child(1) { animation-delay: 0.1s; }
+        .stat-item:nth-child(2) { animation-delay: 0.2s; }
+        .stat-item:nth-child(3) { animation-delay: 0.3s; }
+        .stat-item:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Cormorant Garamond', serif;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+        
+        /* Services Section */
+        .services {
+            padding: 6rem 2rem;
+            background: var(--bg-light);
+        }
+        
+        .section-header {
+            max-width: 800px;
+            margin: 0 auto 4rem;
+            text-align: center;
+        }
+        
+        .section-tag {
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-description {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+        
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        
+        .service-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px var(--shadow-strong);
+        }
+        
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+        
+        .service-card h3 {
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .service-card p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+        
+        /* About Section */
+        .about {
+            padding: 6rem 2rem;
+            background: var(--white);
+        }
+        
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        
+        .about-image {
+            position: relative;
+        }
+        
+        .about-img-wrapper {
+            width: 100%;
+            height: 600px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .about-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .about-content h2 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+        }
+        
+        .about-content p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+        
+        .about-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .about-list li {
+            padding: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-dark);
+            font-size: 1.05rem;
+        }
+        
+        .about-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8EFF3 100%);
+        }
+        
+        .pricing-cards {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .pricing-card {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px var(--shadow);
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .pricing-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px var(--shadow-strong);
+        }
+        
+        .pricing-icon {
+            font-size: 60px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .pricing-card h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .pricing-duration {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .pricing-price {
+            font-size: 3.5rem;
+            color: var(--primary);
+            font-weight: 700;
+            font-family: 'Cormorant Garamond', serif;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pricing-period {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .pricing-features li {
+            padding: 0.7rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-dark);
+        }
+        
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        /* CTA Section */
+        .cta {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+        }
+        
+        .cta p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+        
+        .btn-white {
+            background: var(--white);
+            color: var(--primary);
+            padding: 1.2rem 3rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: var(--white);
+            padding: 3rem 2rem 1.5rem;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        .footer-section p, .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: var(--secondary);
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero-container, .about-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .brain-icon {
+                max-width: 300px;
+                height: 300px;
+                font-size: 120px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .hero-cta {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-
-    <script type="text/babel">
-const { useState, useEffect } = React;
-
-// ─── ICONE SVG ───────────────────────────────────────────────────────────────
-const Calendar = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-    <line x1="16" y1="2" x2="16" y2="6"/>
-    <line x1="8" y1="2" x2="8" y2="6"/>
-    <line x1="3" y1="10" x2="21" y2="10"/>
-  </svg>
-);
-const Clock = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10"/>
-    <polyline points="12 6 12 12 16 14"/>
-  </svg>
-);
-const User = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
-  </svg>
-);
-const Users = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-    <circle cx="9" cy="7" r="4"/>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-  </svg>
-);
-const X = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <line x1="18" y1="6" x2="6" y2="18"/>
-    <line x1="6" y1="6" x2="18" y2="18"/>
-  </svg>
-);
-const Check = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
-const ChevronLeft = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <polyline points="15 18 9 12 15 6"/>
-  </svg>
-);
-const ChevronRight = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <polyline points="9 18 15 12 9 6"/>
-  </svg>
-);
-const Edit = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-  </svg>
-);
-const Lock = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-  </svg>
-);
-const Download = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
-  </svg>
-);
-const FileText = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-    <polyline points="10 9 9 9 8 9"/>
-  </svg>
-);
-const MessageCircle = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-  </svg>
-);
-const Star = ({ className = "w-6 h-6", filled = false }) => (
-  <svg className={className} fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-  </svg>
-);
-const Video = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <polygon points="23 7 16 12 23 17 23 7"/>
-    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-  </svg>
-);
-const Settings = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="3"/>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </svg>
-);
-const HelpCircle = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-    <line x1="12" y1="17" x2="12.01" y2="17"/>
-  </svg>
-);
-const Send = ({ className = "w-6 h-6" }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <line x1="22" y1="2" x2="11" y2="13"/>
-    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-  </svg>
-);
-
-// ─── COSTANTI ────────────────────────────────────────────────────────────────
-const ADMIN_PASSWORD = "vittorio2024";
-const STORAGE_KEY = 'penzo_appointments';
-const BLOCKED_SLOTS_KEY = 'penzo_blocked_slots';
-const PASSWORD_KEY = 'penzo_admin_password';
-const SETTINGS_KEY = 'penzo_settings';
-const QUESTIONS_KEY = 'penzo_questions';
-
-// ─── TELEGRAM CONFIG ─────────────────────────────────────────────────────────
-// ⚠️ INSERISCI QUI IL TUO BOT TOKEN E CHAT ID
-const TELEGRAM_BOT_TOKEN = '8751996587:AAHrDQDaxzqwXvWLzdDJ70-Ivoyu_fKh9ww';
-const TELEGRAM_CHAT_ID = '1065062357';
-
-const sendTelegramNotification = async (message) => {
-  try {
-
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'HTML'
-      })
-    });
-    const data = await response.json();
-    return data.ok;
-  } catch (error) {
-    console.error('Errore Telegram:', error);
-    return false;
-  }
-};
-
-// ─── IMPOSTAZIONI DEFAULT ────────────────────────────────────────────────────
-const DEFAULT_SETTINGS = {
-  priceIndividual: 65,
-  priceCouple: 75,
-  durationIndividual: 50,
-  durationCouple: 50,
-  scheduleStart: 14,
-  scheduleEnd: 19,
-  availableDays: [1, 2, 3, 4, 5], // Lun-Ven
-};
-
-// ─── PIATTAFORME ─────────────────────────────────────────────────────────────
-const PLATFORMS = {
-  zoom: { name: 'Zoom', icon: Video },
-  meet: { name: 'Google Meet', icon: Video },
-  skype: { name: 'Skype', icon: Video }
-};
-
-// ─── FAQ ─────────────────────────────────────────────────────────────────────
-const FAQ_DATA = [
-  { question: "Come funziona una seduta online?", answer: "Le sedute online si svolgono tramite videochiamata sulla piattaforma di tua scelta (Zoom, Google Meet o Skype). Riceverai il link di accesso via email 24 ore prima dell'appuntamento. La qualità terapeutica è identica a quella di una seduta in presenza." },
-  { question: "Ho bisogno di particolari attrezzature?", answer: "Ti serve solo un dispositivo (computer, tablet o smartphone) con webcam, microfono e connessione internet stabile. Assicurati di essere in un luogo tranquillo e riservato durante la seduta." },
-  { question: "Posso cancellare o spostare un appuntamento?", answer: "Sì, puoi cancellare o modificare l'appuntamento con almeno 24 ore di anticipo. Per cancellazioni o modifiche urgenti, contatta direttamente il professionista." },
-  { question: "Come avviene il pagamento?", answer: "Il pagamento viene effettuato dopo la seduta tramite bonifico bancario. Riceverai la fattura via email con le coordinate per il pagamento." },
-  { question: "Le sedute online sono confidenziali?", answer: "Assolutamente sì. Viene garantito lo stesso livello di riservatezza delle sedute in presenza. Le piattaforme utilizzate sono sicure e conformi al GDPR." },
-  { question: "Quanto dura una seduta?", answer: "Ogni seduta dura 50 minuti. È importante presentarsi puntuali all'orario concordato per sfruttare al meglio il tempo a disposizione." }
-];
-
-// ─── TESTIMONIANZE ────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  { name: "Maria G.", rating: 5, text: "Grazie alla terapia online ho potuto continuare il mio percorso anche durante periodi di viaggio. Il Dr. Penzo è molto professionale e la modalità online non toglie nulla all'efficacia delle sedute.", date: "Gennaio 2025" },
-  { name: "Luca R.", rating: 5, text: "Ero scettico all'inizio sulle sedute online, ma mi sono ricreduto. La comodità di poter fare terapia da casa, senza perdere tempo in spostamenti, è impagabile. Consigliatissimo!", date: "Dicembre 2024" },
-  { name: "Sofia M.", rating: 5, text: "Per me che vivo lontano da Parma, la terapia online è stata una benedizione. Il Dr. Penzo è empatico e competente, mi sono sentita ascoltata fin dalla prima seduta.", date: "Novembre 2024" }
-];
-
-// ─── UTILITY ─────────────────────────────────────────────────────────────────
-const formatDate = (date) => date.toISOString().split('T')[0];
-const formatDisplayDate = (dateStr) => {
-  const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-};
-const isWithin24Hours = (date) => {
-  const now = new Date();
-  const selectedDateTime = new Date(date);
-  selectedDateTime.setHours(23, 59, 59, 999);
-  return (selectedDateTime - now) / (1000 * 60 * 60) < 24;
-};
-const canCancelAppointment = (appointmentDate, appointmentTime) => {
-  const now = new Date();
-  const appointmentDateTime = new Date(appointmentDate + 'T' + appointmentTime);
-  return (appointmentDateTime - now) / (1000 * 60 * 60) >= 24;
-};
-const exportToCSV = (appointments) => {
-  const headers = ['Data', 'Orario', 'Paziente', 'Email', 'Telefono', 'Servizio', 'Piattaforma', 'Prezzo'];
-  const rows = appointments.map(apt => [apt.date, apt.time, apt.patientName, apt.patientEmail, apt.patientPhone, apt.serviceName, PLATFORMS[apt.platform]?.name || 'N/D', `€${apt.price}`]);
-  let csvContent = headers.join(',') + '\n';
-  rows.forEach(row => { csvContent += row.map(cell => `"${cell}"`).join(',') + '\n'; });
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.setAttribute('href', URL.createObjectURL(blob));
-  link.setAttribute('download', `appuntamenti_${new Date().toISOString().split('T')[0]}.csv`);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-// ─── COMPONENTE PRINCIPALE ────────────────────────────────────────────────────
-function AppointmentSystem() {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const [appointments, setAppointments] = useState([]);
-  const [blockedSlots, setBlockedSlots] = useState([]);
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [questions, setQuestions] = useState([]);
-
-  const [selectedService, setSelectedService] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [selectedPlatform, setSelectedPlatform] = useState(null);
-  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
-
-  const [patientName, setPatientName] = useState('');
-  const [patientEmail, setPatientEmail] = useState('');
-  const [patientPhone, setPatientPhone] = useState('');
-  const [consentAccepted, setConsentAccepted] = useState(false);
-  const [showConsentModal, setShowConsentModal] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-
-  const [editingAppointment, setEditingAppointment] = useState(null);
-  const [showBlockSlotModal, setShowBlockSlotModal] = useState(false);
-  const [blockSlotDate, setBlockSlotDate] = useState('');
-  const [blockSlotTime, setBlockSlotTime] = useState('');
-  const [blockSlotReason, setBlockSlotReason] = useState('');
-
-  const [showFAQ, setShowFAQ] = useState(false);
-  const [showTestimonials, setShowTestimonials] = useState(false);
-  const [expandedFAQ, setExpandedFAQ] = useState(null);
-
-  // Sezioni admin
-  const [adminSection, setAdminSection] = useState('appointments'); // 'appointments' | 'questions' | 'settings'
-
-  // Domanda anonima
-  const [questionText, setQuestionText] = useState('');
-  const [questionNickname, setQuestionNickname] = useState('');
-  const [questionSent, setQuestionSent] = useState(false);
-
-  // Impostazioni temporanee nell'admin
-  const [tempSettings, setTempSettings] = useState(DEFAULT_SETTINGS);
-
-  // Risposta admin alle domande
-  const [replyingTo, setReplyingTo] = useState(null);
-  const [replyText, setReplyText] = useState('');
-
-  // ─── LOAD/SAVE ──────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const savedBlocked = localStorage.getItem(BLOCKED_SLOTS_KEY);
-    const savedPassword = localStorage.getItem(PASSWORD_KEY);
-    const savedSettings = localStorage.getItem(SETTINGS_KEY);
-    const savedQuestions = localStorage.getItem(QUESTIONS_KEY);
-
-    if (saved) setAppointments(JSON.parse(saved));
-    if (savedBlocked) setBlockedSlots(JSON.parse(savedBlocked));
-    if (!savedPassword) localStorage.setItem(PASSWORD_KEY, ADMIN_PASSWORD);
-    if (savedSettings) {
-      const s = JSON.parse(savedSettings);
-      setSettings(s);
-      setTempSettings(s);
-    }
-    if (savedQuestions) setQuestions(JSON.parse(savedQuestions));
-  }, []);
-
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments)); }, [appointments]);
-  useEffect(() => { localStorage.setItem(BLOCKED_SLOTS_KEY, JSON.stringify(blockedSlots)); }, [blockedSlots]);
-  useEffect(() => { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }, [settings]);
-  useEffect(() => { localStorage.setItem(QUESTIONS_KEY, JSON.stringify(questions)); }, [questions]);
-
-  // ─── SERVICES (dinamici dalle impostazioni) ──────────────────────────────────
-  const SERVICES = {
-    individual: { name: 'Seduta Individuale Online', duration: settings.durationIndividual, price: settings.priceIndividual, icon: User },
-    couple: { name: 'Seduta di Coppia Online', duration: settings.durationCouple, price: settings.priceCouple, icon: Users }
-  };
-
-  // ─── SLOT GENERATOR (dinamico dagli orari) ───────────────────────────────────
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = settings.scheduleStart; hour < settings.scheduleEnd; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      if (hour < settings.scheduleEnd - 1) slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    return slots;
-  };
-
-  // ─── CALENDARIO ──────────────────────────────────────────────────────────────
-  const getWeekDays = (startDate) => {
-    const days = [];
-    const current = new Date(startDate);
-    for (let i = 0; i < 7; i++) { days.push(new Date(current)); current.setDate(current.getDate() + 1); }
-    return days;
-  };
-  const nextWeek = () => { const d = new Date(currentWeekStart); d.setDate(d.getDate() + 7); setCurrentWeekStart(d); };
-  const prevWeek = () => { const d = new Date(currentWeekStart); d.setDate(d.getDate() - 7); setCurrentWeekStart(d); };
-
-  const isSlotBlocked = (date, time) => blockedSlots.some(s => s.date === formatDate(date) && s.time === time);
-  const isSlotBooked = (date, time) => appointments.some(a => a.date === formatDate(date) && a.time === time);
-  const timeToMinutes = (time) => { const [h, m] = time.split(':').map(Number); return h * 60 + m; };
-  const isSlotOccupiedByDuration = (date, time) => {
-    const dateStr = formatDate(date);
-    const slotMin = timeToMinutes(time);
-    return appointments.some(apt => {
-      if (apt.date !== dateStr) return false;
-      const aptStart = timeToMinutes(apt.time);
-      const aptEnd = aptStart + apt.duration;
-      const slotEnd = slotMin + 50;
-      return (slotMin >= aptStart && slotMin < aptEnd) || (slotEnd > aptStart && slotEnd <= aptEnd) || (slotMin <= aptStart && slotEnd >= aptEnd);
-    });
-  };
-  const getAvailableSlots = (date) => {
-    const dayOfWeek = date.getDay();
-    if (!settings.availableDays.includes(dayOfWeek)) return generateTimeSlots().map(time => ({ time, available: false, blocked: false, booked: false }));
-    return generateTimeSlots().map(time => {
-      const blocked = isSlotBlocked(date, time);
-      const booked = isSlotBooked(date, time);
-      const occupied = isSlotOccupiedByDuration(date, time);
-      return { time, available: !blocked && !booked && !occupied, blocked, booked: booked || occupied };
-    });
-  };
-
-  // ─── AUTH ────────────────────────────────────────────────────────────────────
-  const handleLogin = () => {
-    const savedPwd = localStorage.getItem(PASSWORD_KEY) || ADMIN_PASSWORD;
-    if (passwordInput === savedPwd) { setIsAdmin(true); setShowPasswordModal(false); setPasswordInput(''); }
-    else alert('Password errata');
-  };
-  const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) { alert('Le password non coincidono'); return; }
-    if (newPassword.length < 8) { alert('La password deve essere di almeno 8 caratteri'); return; }
-    localStorage.setItem(PASSWORD_KEY, newPassword);
-    alert('✅ Password cambiata con successo!');
-    setShowChangePasswordModal(false); setNewPassword(''); setConfirmPassword('');
-  };
-
-  // ─── PRENOTAZIONE ────────────────────────────────────────────────────────────
-  const bookAppointment = async () => {
-    if (!selectedService || !selectedDate || !selectedTime || !patientName || !patientEmail || !patientPhone || !selectedPlatform) {
-      alert('Compila tutti i campi per prenotare'); return;
-    }
-    if (!consentAccepted) { alert('⚠️ Devi accettare il consenso informato per procedere con la prenotazione.'); return; }
-    if (isSlotBooked(selectedDate, selectedTime) || isSlotBlocked(selectedDate, selectedTime) || isSlotOccupiedByDuration(selectedDate, selectedTime)) {
-      alert('Questo slot non è più disponibile.'); return;
-    }
-    const newAppointment = {
-      id: Date.now(),
-      date: formatDate(selectedDate),
-      time: selectedTime,
-      serviceType: selectedService,
-      serviceName: SERVICES[selectedService].name,
-      price: SERVICES[selectedService].price,
-      duration: SERVICES[selectedService].duration,
-      platform: selectedPlatform,
-      patientName, patientEmail, patientPhone,
-      status: 'confirmed',
-      createdAt: new Date().toISOString()
-    };
-    setAppointments(prev => [...prev, newAppointment]);
-
-    // Notifica Telegram
-    const telegramMsg = `🗓 <b>Nuova Prenotazione!</b>\n\n👤 <b>Paziente:</b> ${patientName}\n📧 Email: ${patientEmail}\n📱 Tel: ${patientPhone}\n\n📋 <b>Servizio:</b> ${SERVICES[selectedService].name}\n🖥 <b>Piattaforma:</b> ${PLATFORMS[selectedPlatform].name}\n📅 <b>Data:</b> ${formatDisplayDate(formatDate(selectedDate))}\n⏰ <b>Orario:</b> ${selectedTime}\n💶 <b>Prezzo:</b> €${SERVICES[selectedService].price}`;
-    await sendTelegramNotification(telegramMsg);
-
-    setShowConfirmation(true);
-    setTimeout(() => {
-      setSelectedService(null); setSelectedDate(new Date()); setSelectedTime(null);
-      setSelectedPlatform(null); setPatientName(''); setPatientEmail('');
-      setPatientPhone(''); setConsentAccepted(false); setShowConfirmation(false);
-    }, 5000);
-  };
-
-  // ─── GESTIONE APPUNTAMENTI ───────────────────────────────────────────────────
-  const deleteAppointment = (id) => {
-    const apt = appointments.find(a => a.id === id);
-    if (!canCancelAppointment(apt.date, apt.time)) {
-      if (confirm('⚠️ Questo appuntamento è tra meno di 24 ore.\nVuoi procedere comunque con la cancellazione?')) {
-        setAppointments(prev => prev.filter(a => a.id !== id));
-        alert('✅ Appuntamento cancellato. Ricordati di contattare il paziente.');
-      }
-      return;
-    }
-    if (confirm('Sei sicuro di voler cancellare questo appuntamento?')) {
-      setAppointments(prev => prev.filter(a => a.id !== id));
-      alert('✅ Appuntamento cancellato con successo.');
-    }
-  };
-  const startEditAppointment = (apt) => {
-    setEditingAppointment(apt);
-    setSelectedDate(new Date(apt.date + 'T00:00:00'));
-    setSelectedTime(apt.time);
-  };
-  const saveEditAppointment = () => {
-    if (!selectedTime) { alert('Seleziona un nuovo orario'); return; }
-    setAppointments(prev => prev.map(a => a.id === editingAppointment.id ? { ...a, date: formatDate(selectedDate), time: selectedTime } : a));
-    setEditingAppointment(null); setSelectedTime(null);
-    alert('✅ Appuntamento modificato. Ricordati di avvisare il paziente.');
-  };
-
-  // ─── SLOT BLOCCO ─────────────────────────────────────────────────────────────
-  const blockTimeSlot = () => {
-    if (!blockSlotDate || !blockSlotTime) { alert('Seleziona data e orario'); return; }
-    setBlockedSlots(prev => [...prev, { id: Date.now(), date: blockSlotDate, time: blockSlotTime, reason: blockSlotReason || 'Impegno personale' }]);
-    setShowBlockSlotModal(false); setBlockSlotDate(''); setBlockSlotTime(''); setBlockSlotReason('');
-  };
-  const unblockTimeSlot = (id) => { if (confirm('Vuoi sbloccare questo slot?')) setBlockedSlots(prev => prev.filter(s => s.id !== id)); };
-
-  // ─── DOMANDE ANONIME ─────────────────────────────────────────────────────────
-  const submitQuestion = async () => {
-    if (!questionText.trim()) { alert('Scrivi la tua domanda prima di inviare'); return; }
-    const newQuestion = {
-      id: Date.now(),
-      nickname: questionNickname.trim() || 'Anonimo',
-      text: questionText.trim(),
-      createdAt: new Date().toISOString(),
-      answer: null,
-      answeredAt: null
-    };
-    setQuestions(prev => [newQuestion, ...prev]);
-    await sendTelegramNotification(`❓ <b>Nuova Domanda Anonima</b>\n\n👤 <b>Da:</b> ${newQuestion.nickname}\n\n💬 <b>Domanda:</b>\n${newQuestion.text}`);
-    setQuestionText(''); setQuestionNickname(''); setQuestionSent(true);
-    setTimeout(() => setQuestionSent(false), 4000);
-  };
-
-  const submitReply = (questionId) => {
-    if (!replyText.trim()) { alert('Scrivi una risposta'); return; }
-    setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, answer: replyText.trim(), answeredAt: new Date().toISOString() } : q));
-    setReplyingTo(null); setReplyText('');
-  };
-
-  const deleteQuestion = (id) => {
-    if (confirm('Eliminare questa domanda?')) setQuestions(prev => prev.filter(q => q.id !== id));
-  };
-
-  // ─── SALVA IMPOSTAZIONI ──────────────────────────────────────────────────────
-  const saveSettings = () => {
-    setSettings(tempSettings);
-    alert('✅ Impostazioni salvate! Le modifiche sono ora visibili ai pazienti.');
-  };
-
-  // ════════════════════════════════════════════════════════════════════════════
-  // VISTA PAZIENTE
-  // ════════════════════════════════════════════════════════════════════════════
-  const PatientView = () => {
-    const answeredQuestions = questions.filter(q => q.answer);
-
-    return (
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Dr. Vittorio Penzo</h1>
-          <p className="text-gray-600">Psicologo - Sedute Online</p>
-          <div className="flex gap-3 justify-center mt-4 flex-wrap">
-            <button onClick={() => setShowFAQ(!showFAQ)} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center gap-2 text-sm">
-              <MessageCircle className="w-4 h-4" /> Domande Frequenti
-            </button>
-            <button onClick={() => setShowTestimonials(!showTestimonials)} className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center gap-2 text-sm">
-              <Star className="w-4 h-4" /> Testimonianze
-            </button>
-          </div>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#home" class="logo">
+                <div class="logo-icon">🧠</div>
+                <div class="logo-text">
+                    <h1>Dr. Vittorio Penzo</h1>
+                    <p>Psicologo Online</p>
+                </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#servizi">Servizi</a></li>
+                <li><a href="#chi-sono">Chi Sono</a></li>
+                <li><a href="#prezzi">Prezzi</a></li>
+                <li><a href="prenota.html" class="btn-prenota-nav">Prenota Seduta</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
         </div>
+    </nav>
 
-        {showFAQ && (
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2"><MessageCircle className="w-6 h-6 text-blue-600" /> Domande Frequenti</h3>
-              <button onClick={() => setShowFAQ(false)} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
-            </div>
-            <div className="space-y-3">
-              {FAQ_DATA.map((faq, idx) => (
-                <div key={idx} className="bg-white rounded-lg border border-blue-200">
-                  <button onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)} className="w-full text-left p-4 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg flex items-center justify-between">
-                    {faq.question} <span className="text-blue-600">{expandedFAQ === idx ? '−' : '+'}</span>
-                  </button>
-                  {expandedFAQ === idx && <div className="px-4 pb-4 text-gray-600 text-sm">{faq.answer}</div>}
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Benvenuto nel tuo <span>spazio di ascolto</span></h1>
+                <p class="hero-subtitle">Supporto psicologico online professionale con approccio cognitivo-comportamentale</p>
+                <div class="hero-cta">
+                    <a href="prenota.html" class="btn-primary">
+                        📅 Prenota una Seduta
+                    </a>
+                    <a href="#chi-sono" class="btn-secondary">Scopri di più</a>
                 </div>
-              ))}
             </div>
-          </div>
-        )}
-
-        {showTestimonials && (
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Star className="w-6 h-6 text-green-600" filled /> Cosa dicono i pazienti</h3>
-              <button onClick={() => setShowTestimonials(false)} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
+            <div class="hero-visual">
+                <div class="brain-icon">🧠</div>
             </div>
-            <div className="space-y-4">
-              {TESTIMONIALS.map((t, idx) => (
-                <div key={idx} className="bg-white rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center gap-2 mb-2">{[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 text-yellow-500" filled />)}</div>
-                  <p className="text-gray-700 mb-2 italic">"{t.text}"</p>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-semibold text-gray-800">{t.name}</span>
-                    <span className="text-gray-500">{t.date}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Selezione servizio */}
-        <div>
-          <label className="block text-lg font-semibold text-gray-700 mb-4">1. Seleziona il tipo di seduta</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(SERVICES).map(([key, service]) => {
-              const Icon = service.icon;
-              return (
-                <div key={key} onClick={() => { setSelectedService(key); setSelectedTime(null); }}
-                  className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${selectedService === key ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800 text-lg mb-1">{service.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{service.duration} minuti</p>
-                      <p className="text-2xl font-bold text-blue-600">€{service.price}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
+    </section>
 
-        {selectedService && (
-          <>
-            {/* Piattaforma */}
-            <div>
-              <label className="block text-lg font-semibold text-gray-700 mb-4">2. Scegli la piattaforma per la videochiamata</label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {Object.entries(PLATFORMS).map(([key, platform]) => {
-                  const Icon = platform.icon;
-                  return (
-                    <div key={key} onClick={() => setSelectedPlatform(key)}
-                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedPlatform === key ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>
-                      <div className="flex flex-col items-center gap-2">
-                        <Icon className="w-8 h-8 text-green-600" />
-                        <span className="font-semibold text-gray-800">{platform.name}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Riceverai il link per la videochiamata via email 24 ore prima dell'appuntamento</p>
+    <!-- Stats -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Online</div>
             </div>
-
-            {/* Calendario */}
-            <div>
-              <label className="block text-lg font-semibold text-gray-700 mb-4">3. Seleziona la data</label>
-              <div className="bg-white border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <button onClick={prevWeek} className="p-2 hover:bg-gray-100 rounded"><ChevronLeft className="w-5 h-5" /></button>
-                  <h3 className="font-semibold text-lg">{currentWeekStart.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}</h3>
-                  <button onClick={nextWeek} className="p-2 hover:bg-gray-100 rounded"><ChevronRight className="w-5 h-5" /></button>
-                </div>
-                <div className="grid grid-cols-7 gap-2">
-                  {getWeekDays(currentWeekStart).map((day, idx) => {
-                    const dateStr = formatDate(day);
-                    const slots = getAvailableSlots(day);
-                    const availableCount = slots.filter(s => s.available).length;
-                    const isSelected = formatDate(selectedDate) === dateStr;
-                    const isPast = day < new Date().setHours(0, 0, 0, 0);
-                    const isWeekend = !settings.availableDays.includes(day.getDay());
-                    const within24h = isWithin24Hours(day);
-                    return (
-                      <div key={idx} onClick={() => {
-                        if (!isPast && !isWeekend && availableCount > 0) {
-                          if (within24h) { alert('⚠️ Le prenotazioni devono essere effettuate con almeno 24 ore di anticipo.'); return; }
-                          setSelectedDate(day); setSelectedTime(null);
-                        }
-                      }} className={`p-3 text-center rounded-lg cursor-pointer transition-all ${isPast || isWeekend || within24h ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : isSelected ? 'bg-blue-500 text-white' : availableCount > 0 ? 'border-2 border-gray-200 hover:border-blue-300' : 'border border-gray-200 text-gray-400'}`}>
-                        <div className="text-xs font-medium">{day.toLocaleDateString('it-IT', { weekday: 'short' })}</div>
-                        <div className="text-lg font-bold mt-1">{day.getDate()}</div>
-                        {within24h && !isPast && <div className="text-xs mt-1 text-red-500">&lt;24h</div>}
-                        {availableCount > 0 && !isPast && !isWeekend && !within24h && <div className="text-xs mt-1">{availableCount} slot</div>}
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-xs text-gray-500 mt-3">⏰ <strong>Importante:</strong> Le prenotazioni richiedono almeno 24 ore di anticipo</p>
-              </div>
+            <div class="stat-item">
+                <div class="stat-number">50'</div>
+                <div class="stat-label">Durata Seduta</div>
             </div>
-
-            {/* Orari */}
-            <div>
-              <label className="block text-lg font-semibold text-gray-700 mb-4">4. Seleziona l'orario - {formatDisplayDate(formatDate(selectedDate))}</label>
-              <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                {getAvailableSlots(selectedDate).map(slot => (
-                  <button key={slot.time} onClick={() => slot.available && setSelectedTime(slot.time)} disabled={!slot.available}
-                    className={`p-4 rounded-lg font-medium transition-all ${selectedTime === slot.time ? 'bg-blue-500 text-white' : slot.available ? 'bg-white border-2 border-gray-200 hover:border-blue-300 text-gray-700' : 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'}`}>
-                    <Clock className="w-5 h-5 mx-auto mb-1" />
-                    {slot.time}
-                    {!slot.available && <div className="text-xs mt-1">{slot.blocked ? 'Non disp.' : 'Occupato'}</div>}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 mt-3">💡 Le sedute durano {SERVICES[selectedService]?.duration} minuti. Gli slot vicini a prenotazioni esistenti potrebbero risultare non disponibili.</p>
+            <div class="stat-item">
+                <div class="stat-number">14-19</div>
+                <div class="stat-label">Orario (Lun-Ven)</div>
             </div>
-
-            {/* Form dati paziente */}
-            {selectedTime && selectedPlatform && (
-              <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">5. I tuoi dati</h3>
-                <form onSubmit={(e) => e.preventDefault()}>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nome e Cognome *</label>
-                      <input type="text" value={patientName} onChange={(e) => setPatientName(e.target.value)} autoComplete="off" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Mario Rossi" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                      <input type="email" value={patientEmail} onChange={(e) => setPatientEmail(e.target.value)} autoComplete="off" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="mario.rossi@email.com" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Telefono *</label>
-                      <input type="tel" value={patientPhone} onChange={(e) => setPatientPhone(e.target.value)} autoComplete="off" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="+39 123 456 7890" />
-                    </div>
-                    <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <FileText className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-gray-800 mb-2">Consenso Informato Obbligatorio</h4>
-                          <p className="text-sm text-gray-700 mb-3">Prima di prenotare, è necessario leggere e accettare il consenso informato.</p>
-                          <button type="button" onClick={() => setShowConsentModal(true)} className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2 text-sm">
-                            <FileText className="w-4 h-4" /> Leggi il Consenso Informato
-                          </button>
-                          <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                            <input type="checkbox" checked={consentAccepted} onChange={(e) => setConsentAccepted(e.target.checked)} className="w-5 h-5 text-blue-600" />
-                            <span className="text-sm font-medium text-gray-800">Ho letto e accetto il consenso informato</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg border-2 border-blue-200">
-                      <h4 className="font-semibold text-gray-800 mb-3">Riepilogo Prenotazione</h4>
-                      <div className="space-y-2 text-sm">
-                        <p><strong>Servizio:</strong> {SERVICES[selectedService].name}</p>
-                        <p><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform].name}</p>
-                        <p><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
-                        <p><strong>Orario:</strong> {selectedTime}</p>
-                        <p><strong>Durata:</strong> {SERVICES[selectedService].duration} minuti</p>
-                        <p className="text-lg font-bold text-blue-600 pt-2">Costo: €{SERVICES[selectedService].price}</p>
-                      </div>
-                    </div>
-                    <button onClick={bookAppointment} disabled={!consentAccepted}
-                      className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${consentAccepted ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-                      <Check className="w-6 h-6" /> Conferma Prenotazione
-                    </button>
-                    <p className="text-xs text-gray-500 text-center">Riceverai un'email di conferma con il link per la videochiamata</p>
-                  </div>
-                </form>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* ─── SEZIONE DOMANDE ANONIME ────────────────────────────────────────── */}
-        <div className="mt-10 border-t-2 border-gray-100 pt-8">
-          <div className="flex items-center gap-3 mb-2">
-            <HelpCircle className="w-7 h-7 text-purple-500" />
-            <h2 className="text-2xl font-bold text-gray-800">Hai una domanda?</h2>
-          </div>
-          <p className="text-gray-500 mb-6 text-sm">Puoi fare una domanda in modo anonimo. Il Dr. Penzo risponderà pubblicamente nella sezione qui sotto.</p>
-
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nickname (opzionale)</label>
-                <input type="text" value={questionNickname} onChange={(e) => setQuestionNickname(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent" placeholder="Es: Utente curioso (lascia vuoto per Anonimo)" maxLength={30} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">La tua domanda *</label>
-                <textarea value={questionText} onChange={(e) => setQuestionText(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent resize-none" rows={4} placeholder="Es: Che differenza c'è tra ansia e panico? Come si manifesta il burnout? Cosa si fa in una prima seduta?..." maxLength={500} />
-                <p className="text-xs text-gray-400 mt-1 text-right">{questionText.length}/500</p>
-              </div>
-              {questionSent ? (
-                <div className="bg-green-100 text-green-700 p-3 rounded-lg flex items-center gap-2 font-medium">
-                  <Check className="w-5 h-5" /> Domanda inviata! Il Dr. Penzo risponderà al più presto.
-                </div>
-              ) : (
-                <button onClick={submitQuestion} className="w-full py-3 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 flex items-center justify-center gap-2">
-                  <Send className="w-5 h-5" /> Invia Domanda
-                </button>
-              )}
-              <p className="text-xs text-gray-400 text-center">⚠️ Non inserire dati personali sensibili. Le domande sono pubbliche una volta risposto.</p>
+            <div class="stat-item">
+                <div class="stat-number">24h</div>
+                <div class="stat-label">Risposta Prenotazioni</div>
             </div>
-          </div>
-
-          {/* Domande con risposta */}
-          {answeredQuestions.length > 0 && (
-            <div>
-              <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-purple-500" /> Domande & Risposte ({answeredQuestions.length})
-              </h3>
-              <div className="space-y-4">
-                {answeredQuestions.map(q => (
-                  <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <HelpCircle className="w-5 h-5 text-purple-500" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-700 text-sm">{q.nickname}</p>
-                        <p className="text-gray-800 mt-1">{q.text}</p>
-                      </div>
-                    </div>
-                    <div className="ml-12 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg p-4">
-                      <p className="text-xs font-bold text-blue-600 mb-1">🩺 Dr. Vittorio Penzo risponde:</p>
-                      <p className="text-gray-700">{q.answer}</p>
-                      <p className="text-xs text-gray-400 mt-2">{new Date(q.answeredAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+    </section>
 
-        {/* Modali paziente */}
-        {showConsentModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold text-gray-800">Consenso Informato</h3>
-                <button onClick={() => setShowConsentModal(false)} className="text-gray-500 hover:text-gray-700"><X className="w-6 h-6" /></button>
-              </div>
-              <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
-                <p className="font-semibold">Dr. Vittorio Penzo - Psicologo</p>
-                <p>Borgo Pace 5, Parma</p>
-                <p>C.F. PNZVTR94A13D086W - P.I. 03729090781</p>
-                <p>Albo Psicologi: 10513A PR</p>
-                <h4 className="font-bold text-lg mt-6">Informazioni sulla prestazione professionale</h4>
-                <p><strong>Tipo di prestazione:</strong> Colloquio psicologico online</p>
-                <p><strong>Finalità:</strong> La prestazione è finalizzata ad attività professionali di promozione e tutela della salute e del benessere.</p>
-                <p><strong>Strumenti utilizzati:</strong> Colloquio clinico, questionari, test (se necessario).</p>
-                <p><strong>Durata:</strong> La durata globale dell'intervento non è definibile a priori. Obiettivi e tempi saranno comunicati e concordati verbalmente durante il percorso.</p>
-                <h4 className="font-bold text-lg mt-6">Diritti del paziente</h4>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>È possibile interrompere il rapporto in qualsiasi momento comunicando al professionista la volontà di interruzione.</li>
-                  <li>Il professionista può proporre l'interruzione quando constata che non vi sia alcun beneficio dall'intervento.</li>
-                  <li>In caso di mancato rispetto dell'appuntamento senza preavviso di almeno 24 ore, il paziente si impegna a saldare comunque il corrispettivo previsto.</li>
+    <!-- Services -->
+    <section class="services" id="servizi">
+        <div class="section-header">
+            <div class="section-tag">Aree di Intervento</div>
+            <h2 class="section-title">Come posso aiutarti</h2>
+            <p class="section-description">Offro supporto psicologico specializzato in diverse aree, utilizzando l'approccio cognitivo-comportamentale</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">😰</div>
+                <h3>Ansia e Disturbi d'Ansia</h3>
+                <p>Gestione dell'ansia generalizzata, attacchi di panico, fobie e preoccupazioni eccessive attraverso tecniche evidence-based.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌧️</div>
+                <h3>Depressione</h3>
+                <p>Supporto per stati depressivi, umore basso, perdita di interesse e difficoltà emotive con un approccio terapeutico strutturato.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">💑</div>
+                <h3>Problemi di Coppia</h3>
+                <p>Terapia di coppia per migliorare la comunicazione, risolvere conflitti e rafforzare il legame affettivo.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌱</div>
+                <h3>Crescita Personale</h3>
+                <p>Percorsi di sviluppo personale, autostima, consapevolezza di sé e raggiungimento degli obiettivi di vita.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">👨‍👩‍👧</div>
+                <h3>Supporto Genitoriale</h3>
+                <p>Consulenza per genitori su gestione dei figli, educazione, difficoltà relazionali e sfide della genitorialità.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🕊️</div>
+                <h3>Elaborazione del Lutto</h3>
+                <p>Accompagnamento nel processo di elaborazione delle perdite e nella gestione del dolore emotivo.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h3>Gestione dello Stress</h3>
+                <p>Tecniche per gestire lo stress quotidiano, burnout lavorativo e trovare un equilibrio vita-lavoro.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="chi-sono">
+        <div class="about-container">
+            <div class="about-image">
+                <div class="about-img-wrapper">
+                    <img src="data:image/jpeg;base64,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" alt="Dr. Vittorio Penzo - Psicologo">
+                </div>
+            </div>
+            <div class="about-content">
+                <h2>Chi Sono</h2>
+                <p>Sono il <strong>Dr. Vittorio Penzo</strong>, psicologo specializzato in <strong>terapia cognitivo-comportamentale</strong>. La mia missione è accompagnarti in un percorso di crescita e benessere psicologico.</p>
+                
+                <p>Credo fortemente nell'importanza di creare uno spazio sicuro, empatico e non giudicante dove poter esplorare le proprie difficoltà e risorse personali.</p>
+                
+                <h3 style="font-size: 1.5rem; color: var(--primary); margin: 2rem 0 1rem;">Il Mio Approccio</h3>
+                <ul class="about-list">
+                    <li>Terapia Cognitivo-Comportamentale (CBT)</li>
+                    <li>Approccio evidence-based e scientificamente validato</li>
+                    <li>Flessibilità e personalizzazione del percorso terapeutico</li>
+                    <li>Obiettivi concreti e misurabili</li>
+                    <li>Collaborazione attiva con il paziente</li>
                 </ul>
-                <h4 className="font-bold text-lg mt-6">Tariffe</h4>
-                <p><strong>Seduta individuale online:</strong> €{settings.priceIndividual} + ENPAP 2%</p>
-                <p><strong>Seduta di coppia online:</strong> €{settings.priceCouple} + ENPAP 2%</p>
-                <p className="text-sm italic">Il compenso non può essere condizionato all'esito o ai risultati dell'intervento professionale.</p>
-                <h4 className="font-bold text-lg mt-6">Modalità di pagamento</h4>
-                <p>Il pagamento dovrà avvenire entro una settimana dalla ricezione della fattura tramite bonifico bancario.</p>
-                <p className="text-sm">Per detrarre la spesa, il pagamento deve avvenire tramite modalità tracciabile (no contanti).</p>
-                <h4 className="font-bold text-lg mt-6">Trattamento dei dati personali (GDPR)</h4>
-                <p>Il Dr. Vittorio Penzo è Titolare del trattamento dei dati personali raccolti, che includono:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Dati anagrafici, di contatto e di pagamento</li>
-                  <li>Dati relativi allo stato di salute fisica o mentale</li>
+                
+                <a href="prenota.html" class="btn-primary" style="margin-top: 1.5rem;">Prenota un Colloquio</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="prezzi">
+        <div class="section-header">
+            <div class="section-tag">Tariffe</div>
+            <h2 class="section-title">Prezzi Trasparenti</h2>
+            <p class="section-description">Tariffe chiare e competitive per sedute online di alta qualità</p>
+        </div>
+        <div class="pricing-cards">
+            <div class="pricing-card">
+                <div class="pricing-icon">👤</div>
+                <h3>Seduta Individuale</h3>
+                <p class="pricing-duration">Online • 50 minuti</p>
+                <div class="pricing-price">€65</div>
+                <p class="pricing-period">a seduta</p>
+                <ul class="pricing-features">
+                    <li>Consulenza psicologica individuale</li>
+                    <li>Approccio cognitivo-comportamentale</li>
+                    <li>Piattaforma sicura e privata</li>
+                    <li>Orari flessibili Lun-Ven 14-19</li>
+                    <li>Prenotazione online immediata</li>
                 </ul>
-                <p>I dati saranno trattati con modalità cartacee ed elettroniche, protetti con adeguate misure di sicurezza, conservati per il tempo necessario (minimo 5 anni per dati sanitari) e resi accessibili solo su richiesta delle Autorità competenti.</p>
-                <h4 className="font-bold text-lg mt-6">Diritti dell'interessato</h4>
-                <p>L'interessato può esercitare i diritti di accesso, rettifica, cancellazione, limitazione del trattamento e portabilità dei dati secondo gli articoli 15-22 del GDPR.</p>
-                <p className="mt-4 text-sm">Per reclami: Garante per la protezione dei dati personali - Piazza Venezia 11, 00187 Roma</p>
-                <p className="text-sm">Email: garante@gpdp.it - PEC: protocollo@pec.gpdp.it</p>
-              </div>
-              <div className="mt-6 flex gap-3">
-                <button onClick={() => { setConsentAccepted(true); setShowConsentModal(false); }} className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600">Ho letto e accetto</button>
-                <button onClick={() => setShowConsentModal(false)} className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300">Chiudi</button>
-              </div>
+                <a href="prenota.html" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Prenota Ora</a>
             </div>
-          </div>
-        )}
-
-        {showConfirmation && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-8 max-w-md w-full text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="w-10 h-10 text-green-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Prenotazione Confermata!</h3>
-              <p className="text-gray-600 mb-4">Grazie {patientName}! Riceverai un'email di conferma a {patientEmail} con il link per la videochiamata su {PLATFORMS[selectedPlatform]?.name}.</p>
-              <div className="bg-gray-50 p-4 rounded-lg text-left">
-                <p className="text-sm mb-1"><strong>Servizio:</strong> {SERVICES[selectedService]?.name}</p>
-                <p className="text-sm mb-1"><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform]?.name}</p>
-                <p className="text-sm mb-1"><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
-                <p className="text-sm mb-1"><strong>Orario:</strong> {selectedTime}</p>
-                <p className="text-sm font-bold text-blue-600 mt-2">€{SERVICES[selectedService]?.price}</p>
-              </div>
-              <p className="text-xs text-gray-500 mt-4">📧 Riceverai un promemoria 24 ore prima dell'appuntamento</p>
+            
+            <div class="pricing-card">
+                <div class="pricing-icon">👥</div>
+                <h3>Seduta di Coppia</h3>
+                <p class="pricing-duration">Online • 50 minuti</p>
+                <div class="pricing-price">€75</div>
+                <p class="pricing-period">a seduta</p>
+                <ul class="pricing-features">
+                    <li>Terapia di coppia online</li>
+                    <li>Entrambi i partner coinvolti</li>
+                    <li>Miglioramento comunicazione</li>
+                    <li>Risoluzione conflitti</li>
+                    <li>Rafforzamento del legame</li>
+                </ul>
+                <a href="prenota.html" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">Prenota Ora</a>
             </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ════════════════════════════════════════════════════════════════════════════
-  // VISTA PROFESSIONISTA
-  // ════════════════════════════════════════════════════════════════════════════
-  const ProfessionalView = () => {
-    const today = new Date();
-    const futureAppointments = appointments
-      .filter(apt => new Date(apt.date) >= today)
-      .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
-    const pendingQuestions = questions.filter(q => !q.answer);
-
-    return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
-          <button onClick={() => setIsAdmin(false)} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Esci</button>
         </div>
+    </section>
 
-        {/* Tab navigation */}
-        <div className="flex gap-2 border-b border-gray-200 pb-0">
-          {[
-            { id: 'appointments', label: '📅 Appuntamenti', badge: futureAppointments.length },
-            { id: 'questions', label: '💬 Domande', badge: pendingQuestions.length },
-            { id: 'settings', label: '⚙️ Impostazioni', badge: null }
-          ].map(tab => (
-            <button key={tab.id} onClick={() => setAdminSection(tab.id)}
-              className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-all ${adminSection === tab.id ? 'bg-white border-2 border-b-white border-gray-200 text-blue-600 -mb-px' : 'text-gray-500 hover:text-gray-700'}`}>
-              {tab.label}
-              {tab.badge > 0 && <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-0.5">{tab.badge}</span>}
-            </button>
-          ))}
+    <!-- CTA -->
+    <section class="cta">
+        <div class="cta-container">
+            <h2>Pronto per iniziare il tuo percorso?</h2>
+            <p>Prenota la tua prima seduta oggi stesso. Il primo passo verso il benessere inizia qui.</p>
+            <a href="prenota.html" class="btn-white">📅 Prenota la Tua Seduta</a>
         </div>
+    </section>
 
-        {/* ── TAB APPUNTAMENTI ───────────────────────────────────────────────── */}
-        {adminSection === 'appointments' && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              <button onClick={() => setShowBlockSlotModal(true)} className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2">
-                <Lock className="w-4 h-4" /> Blocca Slot
-              </button>
-              <button onClick={() => exportToCSV(appointments)} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2">
-                <Download className="w-4 h-4" /> Esporta in Excel
-              </button>
-              <button onClick={() => setShowChangePasswordModal(true)} className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center gap-2">
-                <Lock className="w-4 h-4" /> Cambia Password
-              </button>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Dr. Vittorio Penzo</h3>
+                <p>Psicologo specializzato in terapia cognitivo-comportamentale</p>
+                <p>Sedute online dal lunedì al venerdì, 14:00 - 19:00</p>
             </div>
-
-            {blockedSlots.length > 0 && (
-              <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Slot Bloccati ({blockedSlots.length})</h3>
-                <div className="space-y-2">
-                  {blockedSlots.map(slot => (
-                    <div key={slot.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">{formatDisplayDate(slot.date)} - {slot.time}</p>
-                        <p className="text-sm text-gray-600">{slot.reason}</p>
-                      </div>
-                      <button onClick={() => unblockTimeSlot(slot.id)} className="p-2 text-red-500 hover:bg-red-50 rounded"><X className="w-5 h-5" /></button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div>
-              <h3 className="font-semibold text-gray-800 mb-3">Prossimi Appuntamenti ({futureAppointments.length})</h3>
-              <div className="space-y-3">
-                {futureAppointments.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <Calendar className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-600">Nessun appuntamento in programma</p>
-                  </div>
-                ) : (
-                  futureAppointments.map(apt => {
-                    const canCancel = canCancelAppointment(apt.date, apt.time);
-                    return (
-                      <div key={apt.id} className={`bg-white border-2 rounded-lg p-4 ${!canCancel ? 'border-yellow-300' : 'border-gray-200'}`}>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                <User className="w-6 h-6 text-blue-600" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-gray-800 text-lg">{apt.patientName}</h3>
-                                <p className="text-sm text-gray-600">{apt.patientEmail}</p>
-                                <p className="text-sm text-gray-600">{apt.patientPhone}</p>
-                              </div>
-                            </div>
-                            <div className="space-y-1 bg-gray-50 p-3 rounded">
-                              <p className="text-sm"><strong>Servizio:</strong> {apt.serviceName}</p>
-                              <p className="text-sm"><strong>Piattaforma:</strong> {PLATFORMS[apt.platform]?.name || 'N/D'}</p>
-                              <p className="text-sm"><strong>Data:</strong> {formatDisplayDate(apt.date)}</p>
-                              <p className="text-sm"><strong>Orario:</strong> {apt.time}</p>
-                              <p className="text-sm font-bold text-blue-600">€{apt.price}</p>
-                              {!canCancel && <p className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded mt-2">⚠️ Appuntamento tra meno di 24 ore</p>}
-                            </div>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            <button onClick={() => startEditAppointment(apt)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg" title="Modifica">
-                              <Edit className="w-5 h-5" />
-                            </button>
-                            <button onClick={() => deleteAppointment(apt.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Cancella">
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+            <div class="footer-section">
+                <h3>Link Utili</h3>
+                <a href="#home">Home</a>
+                <a href="#servizi">Servizi</a>
+                <a href="#chi-sono">Chi Sono</a>
+                <a href="#prezzi">Prezzi</a>
+                <a href="prenota.html">Prenota</a>
             </div>
-          </div>
-        )}
-
-        {/* ── TAB DOMANDE ────────────────────────────────────────────────────── */}
-        {adminSection === 'questions' && (
-          <div className="space-y-4">
-            {questions.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <HelpCircle className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600">Nessuna domanda ricevuta</p>
-              </div>
-            ) : (
-              <>
-                {pendingQuestions.length > 0 && (
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      ⏳ In attesa di risposta ({pendingQuestions.length})
-                    </h3>
-                    <div className="space-y-3">
-                      {pendingQuestions.map(q => (
-                        <div key={q.id} className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-5">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="font-semibold text-gray-700 text-sm">👤 {q.nickname}</p>
-                              <p className="text-xs text-gray-400">{new Date(q.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
-                            </div>
-                            <button onClick={() => deleteQuestion(q.id)} className="p-1 text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
-                          </div>
-                          <p className="text-gray-800 mb-4 bg-white p-3 rounded-lg border">{q.text}</p>
-                          {replyingTo === q.id ? (
-                            <div className="space-y-2">
-                              <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none" rows={3} placeholder="Scrivi la tua risposta pubblica..." />
-                              <div className="flex gap-2">
-                                <button onClick={() => submitReply(q.id)} className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 font-medium flex items-center justify-center gap-2">
-                                  <Send className="w-4 h-4" /> Pubblica Risposta
-                                </button>
-                                <button onClick={() => { setReplyingTo(null); setReplyText(''); }} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Annulla</button>
-                              </div>
-                            </div>
-                          ) : (
-                            <button onClick={() => { setReplyingTo(q.id); setReplyText(''); }} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 text-sm">
-                              <Edit className="w-4 h-4" /> Rispondi
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {questions.filter(q => q.answer).length > 0 && (
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-3">✅ Risposte pubblicate ({questions.filter(q => q.answer).length})</h3>
-                    <div className="space-y-3">
-                      {questions.filter(q => q.answer).map(q => (
-                        <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <p className="font-semibold text-gray-600 text-sm">👤 {q.nickname}</p>
-                            <button onClick={() => deleteQuestion(q.id)} className="p-1 text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
-                          </div>
-                          <p className="text-gray-700 text-sm mb-2 italic">"{q.text}"</p>
-                          <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
-                            <p className="text-xs font-bold text-blue-600 mb-1">🩺 La tua risposta:</p>
-                            <p className="text-gray-700 text-sm">{q.answer}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* ── TAB IMPOSTAZIONI ───────────────────────────────────────────────── */}
-        {adminSection === 'settings' && (
-          <div className="space-y-6">
-            {/* Prezzi */}
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-                <span>💶</span> Prezzi Sedute
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta Individuale (€)</label>
-                  <input type="number" value={tempSettings.priceIndividual} onChange={(e) => setTempSettings(p => ({ ...p, priceIndividual: parseInt(e.target.value) || 0 }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="0" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta di Coppia (€)</label>
-                  <input type="number" value={tempSettings.priceCouple} onChange={(e) => setTempSettings(p => ({ ...p, priceCouple: parseInt(e.target.value) || 0 }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="0" />
-                </div>
-              </div>
+            <div class="footer-section">
+                <h3>Contatti</h3>
+                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e4928d90908b968d94818a9e8bca94978da48389858d88ca878b89">[email&#160;protected]</a></p>
+                <p>Disponibilità: Lun-Ven 14:00-19:00</p>
+                <p>Modalità: Solo online</p>
             </div>
-
-            {/* Durata */}
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-                <span>⏱</span> Durata Sedute (minuti)
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta Individuale</label>
-                  <input type="number" value={tempSettings.durationIndividual} onChange={(e) => setTempSettings(p => ({ ...p, durationIndividual: parseInt(e.target.value) || 50 }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="10" max="120" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta di Coppia</label>
-                  <input type="number" value={tempSettings.durationCouple} onChange={(e) => setTempSettings(p => ({ ...p, durationCouple: parseInt(e.target.value) || 50 }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="10" max="120" />
-                </div>
-              </div>
-            </div>
-
-            {/* Orari */}
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-                <span>🕐</span> Orari Disponibilità
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ora Inizio</label>
-                  <select value={tempSettings.scheduleStart} onChange={(e) => setTempSettings(p => ({ ...p, scheduleStart: parseInt(e.target.value) }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
-                    {Array.from({ length: 13 }, (_, i) => i + 8).map(h => (
-                      <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ora Fine</label>
-                  <select value={tempSettings.scheduleEnd} onChange={(e) => setTempSettings(p => ({ ...p, scheduleEnd: parseInt(e.target.value) }))}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
-                    {Array.from({ length: 13 }, (_, i) => i + 9).map(h => (
-                      <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Giorni Disponibili</label>
-                <div className="flex flex-wrap gap-2">
-                  {[{ d: 1, n: 'Lunedì' }, { d: 2, n: 'Martedì' }, { d: 3, n: 'Mercoledì' }, { d: 4, n: 'Giovedì' }, { d: 5, n: 'Venerdì' }, { d: 6, n: 'Sabato' }, { d: 0, n: 'Domenica' }].map(({ d, n }) => {
-                    const active = tempSettings.availableDays.includes(d);
-                    return (
-                      <button key={d} onClick={() => setTempSettings(p => ({
-                        ...p,
-                        availableDays: active ? p.availableDays.filter(x => x !== d) : [...p.availableDays, d]
-                      }))} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${active ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                        {n}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Telegram Config */}
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h3 className="font-bold text-gray-800 text-lg mb-2 flex items-center gap-2">
-                <span>📱</span> Notifiche Telegram
-              </h3>
-              <p className="text-sm text-gray-500 mb-4">Per configurare le notifiche Telegram, modifica direttamente il file <code className="bg-gray-100 px-1 rounded">prenota.html</code> inserendo il tuo <strong>Bot Token</strong> e <strong>Chat ID</strong> nelle variabili <code className="bg-gray-100 px-1 rounded">TELEGRAM_BOT_TOKEN</code> e <code className="bg-gray-100 px-1 rounded">TELEGRAM_CHAT_ID</code> in cima al codice.</p>
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                <p className="text-xs text-gray-500 font-mono">
-                  1. Scrivi a @BotFather su Telegram → /newbot<br/>
-                  2. Copia il token ricevuto<br/>
-                  3. Scrivi un messaggio al tuo bot<br/>
-                  4. Vai su: api.telegram.org/bot<b>[TOKEN]</b>/getUpdates<br/>
-                  5. Copia il "chat":"id" dal risultato
-                </p>
-              </div>
-            </div>
-
-            <button onClick={saveSettings} className="w-full py-4 bg-green-500 text-white rounded-xl font-bold text-lg hover:bg-green-600 flex items-center justify-center gap-2">
-              <Check className="w-6 h-6" /> Salva Tutte le Impostazioni
-            </button>
-          </div>
-        )}
-
-        {/* Modali admin */}
-        {showChangePasswordModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold mb-4">Cambia Password</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Nuova Password</label>
-                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full p-2 border rounded" placeholder="Minimo 8 caratteri" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Conferma Password</label>
-                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full p-2 border rounded" placeholder="Ripeti la password" />
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={handleChangePassword} className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Cambia Password</button>
-                  <button onClick={() => { setShowChangePasswordModal(false); setNewPassword(''); setConfirmPassword(''); }} className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300">Annulla</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {editingAppointment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-xl font-bold mb-4">Modifica Appuntamento</h3>
-              <p className="mb-4">Paziente: <strong>{editingAppointment.patientName}</strong></p>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Nuova Data</label>
-                <input type="date" value={formatDate(selectedDate)} onChange={(e) => setSelectedDate(new Date(e.target.value))} className="w-full p-2 border rounded" />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Nuovo Orario</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {getAvailableSlots(selectedDate).map(slot => (
-                    <button key={slot.time} onClick={() => slot.available && setSelectedTime(slot.time)} disabled={!slot.available}
-                      className={`p-2 rounded ${selectedTime === slot.time ? 'bg-blue-500 text-white' : slot.available ? 'bg-gray-100 hover:bg-gray-200' : 'bg-gray-50 text-gray-400 cursor-not-allowed'}`}>
-                      {slot.time}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={saveEditAppointment} className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Salva Modifiche</button>
-                <button onClick={() => { setEditingAppointment(null); setSelectedTime(null); }} className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300">Annulla</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showBlockSlotModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold mb-4">Blocca Slot Orario</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Data</label>
-                  <input type="date" value={blockSlotDate} onChange={(e) => setBlockSlotDate(e.target.value)} className="w-full p-2 border rounded" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Orario</label>
-                  <select value={blockSlotTime} onChange={(e) => setBlockSlotTime(e.target.value)} className="w-full p-2 border rounded">
-                    <option value="">Seleziona orario</option>
-                    {generateTimeSlots().map(time => <option key={time} value={time}>{time}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Motivo (opzionale)</label>
-                  <input type="text" value={blockSlotReason} onChange={(e) => setBlockSlotReason(e.target.value)} placeholder="Es: Impegno personale" className="w-full p-2 border rounded" />
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={blockTimeSlot} className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600">Blocca Slot</button>
-                  <button onClick={() => { setShowBlockSlotModal(false); setBlockSlotDate(''); setBlockSlotTime(''); setBlockSlotReason(''); }} className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300">Annulla</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ─── LOGIN MODAL ─────────────────────────────────────────────────────────────
-  if (!isAdmin && showPasswordModal) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-8 h-8 text-blue-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
-            <p className="text-gray-600 mt-2">Inserisci la password per accedere</p>
-          </div>
-          <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-            className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Password" />
-          <div className="flex gap-3">
-            <button onClick={handleLogin} className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600">Accedi</button>
-            <button onClick={() => setShowPasswordModal(false)} className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300">Annulla</button>
-          </div>
         </div>
-      </div>
-    );
-  }
+        <div class="footer-bottom">
+            <p>&copy; 2026 Dr. Vittorio Penzo - Psicologo. Tutti i diritti riservati. | <a href="admin.html" style="color: #6B7280; text-decoration: none; font-size: 0.85rem;">Admin</a></p>
+        </div>
+    </footer>
 
-  // ─── LAYOUT PRINCIPALE ───────────────────────────────────────────────────────
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">Dr. Vittorio Penzo</h1>
-                <p className="text-sm text-gray-600">Psicologo - Prenotazione Online</p>
-              </div>
+    <!-- Admin Access Button -->
+    <button id="adminBtn" style="position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none; box-shadow: 0 4px 12px rgba(44, 95, 115, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; transition: all 0.3s; z-index: 999;" onclick="openAdminModal()">
+        ⚙️
+    </button>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 3rem; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+            <h2 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">🔐 Accesso Admin</h2>
+            <p style="text-align: center; color: #6B7280; margin-bottom: 2rem;">Inserisci la password per accedere al pannello di gestione</p>
+            
+            <div id="adminError" style="display: none; background: #FEE2E2; color: #DC2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; text-align: center;">
+                Password errata. Riprova.
             </div>
-            {!isAdmin && (
-              <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center gap-2 text-sm">
-                <Lock className="w-4 h-4" /> Area Professionista
-              </button>
-            )}
-          </div>
+            
+            <input type="password" id="adminPassword" placeholder="Password" style="width: 100%; padding: 0.875rem 1rem; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; margin-bottom: 1.5rem;" onkeypress="if(event.key==='Enter') checkAdminPassword()">
+            
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="closeAdminModal()" style="flex: 1; padding: 0.875rem; background: #F3F4F6; color: #374151; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Annulla</button>
+                <button onclick="checkAdminPassword()" style="flex: 1; padding: 0.875rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Accedi</button>
+            </div>
         </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {isAdmin ? <ProfessionalView /> : <PatientView />}
-        </div>
-        {!isAdmin && (
-          <div className="mt-6 text-center text-sm text-gray-600 bg-white rounded-lg p-4">
-            <p className="font-semibold mb-2">🔒 Privacy e Riservatezza</p>
-            <p>Le tue informazioni personali sono protette e utilizzate esclusivamente per la gestione degli appuntamenti</p>
-          </div>
-        )}
-      </div>
     </div>
-  );
-}
 
-ReactDOM.render(<AppointmentSystem />, document.getElementById('root'));
-    </script>
-</body>
-</html>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        const ADMIN_PASSWORD = 'vittorio2024';
+        
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('adminPassword').focus();
+        }
+        
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminError').style.display = 'none';
+        }
+        
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('adminError').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+        
+        // Close modal on outside click
+        document.getElementById('adminModal').addEventListener('click', (e) => {
+            if (e.target.id === 'adminModal') {
+                closeAdminModal();
+            }
+        });
+    
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar shadow on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY 

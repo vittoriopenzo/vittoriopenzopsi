@@ -17,11 +17,21 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-        (function(){
-            emailjs.init("k2sQv1pISznfvgfvN");
-        })();
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCP7chEuq2htBxi9jMNlFwAatSDndKyV6w",
+        authDomain: "vittoriopenzopsi-8bafd.firebaseapp.com",
+        databaseURL: "https://vittoriopenzopsi-8bafd-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vittoriopenzopsi-8bafd",
+        storageBucket: "vittoriopenzopsi-8bafd.firebasestorage.app",
+        messagingSenderId: "843610290485",
+        appId: "1:843610290485:web:48f21f1b665e979a3ab47c"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
     </script>
 </head>
 <body>
@@ -30,7 +40,7 @@
     <script type="text/babel">
 const { useState, useEffect } = React;
 
-// Icone SVG
+// ─── ICONE SVG ───────────────────────────────────────────────────────────────
 const Calendar = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
@@ -39,21 +49,18 @@ const Calendar = ({ className = "w-6 h-6" }) => (
     <line x1="3" y1="10" x2="21" y2="10"/>
   </svg>
 );
-
 const Clock = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="10"/>
     <polyline points="12 6 12 12 16 14"/>
   </svg>
 );
-
 const User = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
     <circle cx="12" cy="7" r="4"/>
   </svg>
 );
-
 const Users = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -62,46 +69,39 @@ const Users = ({ className = "w-6 h-6" }) => (
     <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
   </svg>
 );
-
 const X = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <line x1="18" y1="6" x2="6" y2="18"/>
     <line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 );
-
 const Check = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
-
 const ChevronLeft = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <polyline points="15 18 9 12 15 6"/>
   </svg>
 );
-
 const ChevronRight = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <polyline points="9 18 15 12 9 6"/>
   </svg>
 );
-
 const Edit = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
   </svg>
 );
-
 const Lock = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
   </svg>
 );
-
 const Download = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -109,7 +109,6 @@ const Download = ({ className = "w-6 h-6" }) => (
     <line x1="12" y1="15" x2="12" y2="3"/>
   </svg>
 );
-
 const FileText = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -119,201 +118,144 @@ const FileText = ({ className = "w-6 h-6" }) => (
     <polyline points="10 9 9 9 8 9"/>
   </svg>
 );
-
 const MessageCircle = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
   </svg>
 );
-
 const Star = ({ className = "w-6 h-6", filled = false }) => (
   <svg className={className} fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
   </svg>
 );
-
 const Video = ({ className = "w-6 h-6" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <polygon points="23 7 16 12 23 17 23 7"/>
     <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
   </svg>
 );
+const Settings = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+);
+const HelpCircle = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+    <line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+);
+const Send = ({ className = "w-6 h-6" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <line x1="22" y1="2" x2="11" y2="13"/>
+    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+  </svg>
+);
 
-// Configurazione servizi
-const SERVICES = {
-  individual: {
-    name: 'Seduta Individuale Online',
-    duration: 50,
-    price: 65,
-    icon: User
-  },
-  couple: {
-    name: 'Seduta di Coppia Online',
-    duration: 50,
-    price: 75,
-    icon: Users
+// ─── COSTANTI ────────────────────────────────────────────────────────────────
+const ADMIN_PASSWORD = "vittorio2024";
+const STORAGE_KEY = 'penzo_appointments';
+const BLOCKED_SLOTS_KEY = 'penzo_blocked_slots';
+const PASSWORD_KEY = 'penzo_admin_password';
+const SETTINGS_KEY = 'penzo_settings';
+const QUESTIONS_KEY = 'penzo_questions';
+
+// ─── TELEGRAM CONFIG ─────────────────────────────────────────────────────────
+// ⚠️ INSERISCI QUI IL TUO BOT TOKEN E CHAT ID
+const TELEGRAM_BOT_TOKEN = '8751996587:AAHrDQDaxzqwXvWLzdDJ70-Ivoyu_fKh9ww';
+const TELEGRAM_CHAT_ID = '1065062357';
+
+const sendTelegramNotification = async (message) => {
+  try {
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML'
+      })
+    });
+    const data = await response.json();
+    return data.ok;
+  } catch (error) {
+    console.error('Errore Telegram:', error);
+    return false;
   }
 };
 
-// Piattaforme disponibili
+// ─── IMPOSTAZIONI DEFAULT ────────────────────────────────────────────────────
+const DEFAULT_SETTINGS = {
+  priceIndividual: 65,
+  priceCouple: 75,
+  durationIndividual: 50,
+  durationCouple: 50,
+  scheduleStart: 14,
+  scheduleEnd: 19,
+  availableDays: [1, 2, 3, 4, 5], // Lun-Ven
+};
+
+// ─── PIATTAFORME ─────────────────────────────────────────────────────────────
 const PLATFORMS = {
   zoom: { name: 'Zoom', icon: Video },
   meet: { name: 'Google Meet', icon: Video },
   skype: { name: 'Skype', icon: Video }
 };
 
-// FAQ
+// ─── FAQ ─────────────────────────────────────────────────────────────────────
 const FAQ_DATA = [
-  {
-    question: "Come funziona una seduta online?",
-    answer: "Le sedute online si svolgono tramite videochiamata sulla piattaforma di tua scelta (Zoom, Google Meet o Skype). Riceverai il link di accesso via email 24 ore prima dell'appuntamento. La qualità terapeutica è identica a quella di una seduta in presenza."
-  },
-  {
-    question: "Ho bisogno di particolari attrezzature?",
-    answer: "Ti serve solo un dispositivo (computer, tablet o smartphone) con webcam, microfono e connessione internet stabile. Assicurati di essere in un luogo tranquillo e riservato durante la seduta."
-  },
-  {
-    question: "Posso cancellare o spostare un appuntamento?",
-    answer: "Sì, puoi cancellare o modificare l'appuntamento con almeno 24 ore di anticipo. Per cancellazioni o modifiche urgenti, contatta direttamente il professionista."
-  },
-  {
-    question: "Come avviene il pagamento?",
-    answer: "Il pagamento viene effettuato dopo la seduta tramite bonifico bancario. Riceverai la fattura via email con le coordinate per il pagamento."
-  },
-  {
-    question: "Le sedute online sono confidenziali?",
-    answer: "Assolutamente sì. Viene garantito lo stesso livello di riservatezza delle sedute in presenza. Le piattaforme utilizzate sono sicure e conformi al GDPR."
-  },
-  {
-    question: "Quanto dura una seduta?",
-    answer: "Ogni seduta dura 50 minuti. È importante presentarsi puntuali all'orario concordato per sfruttare al meglio il tempo a disposizione."
-  }
+  { question: "Come funziona una seduta online?", answer: "Le sedute online si svolgono tramite videochiamata sulla piattaforma di tua scelta (Zoom, Google Meet o Skype). Riceverai il link di accesso via email 24 ore prima dell'appuntamento. La qualità terapeutica è identica a quella di una seduta in presenza." },
+  { question: "Ho bisogno di particolari attrezzature?", answer: "Ti serve solo un dispositivo (computer, tablet o smartphone) con webcam, microfono e connessione internet stabile. Assicurati di essere in un luogo tranquillo e riservato durante la seduta." },
+  { question: "Posso cancellare o spostare un appuntamento?", answer: "Sì, puoi cancellare o modificare l'appuntamento con almeno 24 ore di anticipo. Per cancellazioni o modifiche urgenti, contatta direttamente il professionista." },
+  { question: "Come avviene il pagamento?", answer: "Il pagamento viene effettuato dopo la seduta tramite bonifico bancario. Riceverai la fattura via email con le coordinate per il pagamento." },
+  { question: "Le sedute online sono confidenziali?", answer: "Assolutamente sì. Viene garantito lo stesso livello di riservatezza delle sedute in presenza. Le piattaforme utilizzate sono sicure e conformi al GDPR." },
+  { question: "Quanto dura una seduta?", answer: "Ogni seduta dura 50 minuti. È importante presentarsi puntuali all'orario concordato per sfruttare al meglio il tempo a disposizione." }
 ];
 
-// Testimonianze
+// ─── TESTIMONIANZE ────────────────────────────────────────────────────────────
 const TESTIMONIALS = [
-  {
-    name: "Maria G.",
-    rating: 5,
-    text: "Grazie alla terapia online ho potuto continuare il mio percorso anche durante periodi di viaggio. Il Dr. Penzo è molto professionale e la modalità online non toglie nulla all'efficacia delle sedute.",
-    date: "Gennaio 2025"
-  },
-  {
-    name: "Luca R.",
-    rating: 5,
-    text: "Ero scettico all'inizio sulle sedute online, ma mi sono ricreduto. La comodità di poter fare terapia da casa, senza perdere tempo in spostamenti, è impagabile. Consigliatissimo!",
-    date: "Dicembre 2024"
-  },
-  {
-    name: "Sofia M.",
-    rating: 5,
-    text: "Per me che vivo lontano da Parma, la terapia online è stata una benedizione. Il Dr. Penzo è empatico e competente, mi sono sentita ascoltata fin dalla prima seduta.",
-    date: "Novembre 2024"
-  }
+  { name: "Maria G.", rating: 5, text: "Grazie alla terapia online ho potuto continuare il mio percorso anche durante periodi di viaggio. Il Dr. Penzo è molto professionale e la modalità online non toglie nulla all'efficacia delle sedute.", date: "Gennaio 2025" },
+  { name: "Luca R.", rating: 5, text: "Ero scettico all'inizio sulle sedute online, ma mi sono ricreduto. La comodità di poter fare terapia da casa, senza perdere tempo in spostamenti, è impagabile. Consigliatissimo!", date: "Dicembre 2024" },
+  { name: "Sofia M.", rating: 5, text: "Per me che vivo lontano da Parma, la terapia online è stata una benedizione. Il Dr. Penzo è empatico e competente, mi sono sentita ascoltata fin dalla prima seduta.", date: "Novembre 2024" }
 ];
 
-// Password per area professionista
-const ADMIN_PASSWORD = "vittorio2024";
-
-// Storage nel localStorage 
-const STORAGE_KEY = 'penzo_appointments';
-const BLOCKED_SLOTS_KEY = 'penzo_blocked_slots';
-const PASSWORD_KEY = 'penzo_admin_password';
-
-// Funzioni utility
-const formatDate = (date) => {
-  return date.toISOString().split('T')[0];
-};
-
+// ─── UTILITY ─────────────────────────────────────────────────────────────────
+const formatDate = (date) => date.toISOString().split('T')[0];
 const formatDisplayDate = (dateStr) => {
   const date = new Date(dateStr + 'T00:00:00');
   return date.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 };
-
-const generateTimeSlots = () => {
-  const slots = [];
-  for (let hour = 14; hour < 19; hour++) {
-    slots.push(`${hour.toString().padStart(2, '0')}:00`);
-    if (hour < 18) {
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-  }
-  return slots;
-};
-
-// ✅ REGOLA 24H - Verifica se la data è entro 24 ore
 const isWithin24Hours = (date) => {
   const now = new Date();
   const selectedDateTime = new Date(date);
   selectedDateTime.setHours(23, 59, 59, 999);
-  const diffInHours = (selectedDateTime - now) / (1000 * 60 * 60);
-  return diffInHours < 24;
+  return (selectedDateTime - now) / (1000 * 60 * 60) < 24;
 };
-
-// ✅ REGOLA 24H - Verifica se un appuntamento può essere cancellato
 const canCancelAppointment = (appointmentDate, appointmentTime) => {
   const now = new Date();
   const appointmentDateTime = new Date(appointmentDate + 'T' + appointmentTime);
-  const diffInHours = (appointmentDateTime - now) / (1000 * 60 * 60);
-  return diffInHours >= 24;
+  return (appointmentDateTime - now) / (1000 * 60 * 60) >= 24;
 };
-
-// ✅ EMAIL CORRETTA - Funzione per inviare email
-const sendEmailNotification = async (appointmentData) => {
-  try {
-    const platformName = PLATFORMS[appointmentData.platform]?.name || 'Non specificata';
-    
-    const templateParams = {
-      name: appointmentData.patientName,  // ✅ PARAMETRO RICHIESTO DAL TEMPLATE
-      patient_name: appointmentData.patientName,
-      patient_email: appointmentData.patientEmail,
-      patient_phone: appointmentData.patientPhone,
-      service_type: appointmentData.serviceType === 'individual' ? 'Seduta Individuale' : 'Seduta di Coppia',
-      appointment_date: formatDisplayDate(appointmentData.date),
-      appointment_time: appointmentData.time,
-      price: appointmentData.price,
-      platform: platformName
-    };
-
-    const result = await emailjs.send('service_jo0kg0d', 'template_vttk3n', templateParams);
-    console.log('✅ Email inviata con successo:', result);
-    return true;
-  } catch (error) {
-    console.error('❌ Errore invio email:', error);
-    return false;
-  }
-};
-
-// ✅ ESPORTA EXCEL - Esporta appuntamenti in CSV
 const exportToCSV = (appointments) => {
   const headers = ['Data', 'Orario', 'Paziente', 'Email', 'Telefono', 'Servizio', 'Piattaforma', 'Prezzo'];
-  const rows = appointments.map(apt => [
-    apt.date,
-    apt.time,
-    apt.patientName,
-    apt.patientEmail,
-    apt.patientPhone,
-    apt.serviceName,
-    PLATFORMS[apt.platform]?.name || 'N/D',
-    `€${apt.price}`
-  ]);
-  
+  const rows = appointments.map(apt => [apt.date, apt.time, apt.patientName, apt.patientEmail, apt.patientPhone, apt.serviceName, PLATFORMS[apt.platform]?.name || 'N/D', `€${apt.price}`]);
   let csvContent = headers.join(',') + '\n';
-  rows.forEach(row => {
-    csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
-  });
-  
+  rows.forEach(row => { csvContent += row.map(cell => `"${cell}"`).join(',') + '\n'; });
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  link.setAttribute('href', url);
+  link.setAttribute('href', URL.createObjectURL(blob));
   link.setAttribute('download', `appuntamenti_${new Date().toISOString().split('T')[0]}.csv`);
   link.style.visibility = 'hidden';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
 };
-// Componente principale
+
+// ─── COMPONENTE PRINCIPALE ────────────────────────────────────────────────────
 function AppointmentSystem() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -321,179 +263,175 @@ function AppointmentSystem() {
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   const [appointments, setAppointments] = useState([]);
   const [blockedSlots, setBlockedSlots] = useState([]);
-  
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [questions, setQuestions] = useState([]);
+
   const [selectedService, setSelectedService] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
-  
+
   const [patientName, setPatientName] = useState('');
   const [patientEmail, setPatientEmail] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [consentAccepted, setConsentAccepted] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
-  
   const [showConfirmation, setShowConfirmation] = useState(false);
+
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [showBlockSlotModal, setShowBlockSlotModal] = useState(false);
   const [blockSlotDate, setBlockSlotDate] = useState('');
   const [blockSlotTime, setBlockSlotTime] = useState('');
   const [blockSlotReason, setBlockSlotReason] = useState('');
-  
+
   const [showFAQ, setShowFAQ] = useState(false);
   const [showTestimonials, setShowTestimonials] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState(null);
 
+  // Sezioni admin
+  const [adminSection, setAdminSection] = useState('appointments'); // 'appointments' | 'questions' | 'settings'
+
+  // Domanda anonima
+  const [questionText, setQuestionText] = useState('');
+  const [questionNickname, setQuestionNickname] = useState('');
+  const [questionSent, setQuestionSent] = useState(false);
+
+  // Impostazioni temporanee nell'admin
+  const [tempSettings, setTempSettings] = useState(DEFAULT_SETTINGS);
+
+  // Risposta admin alle domande
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState('');
+
+  // ─── FIREBASE LOAD/SAVE ─────────────────────────────────────────────────────
+  const [dbReady, setDbReady] = useState(false);
+
   useEffect(() => {
-    const savedAppointments = localStorage.getItem(STORAGE_KEY);
-    const savedBlockedSlots = localStorage.getItem(BLOCKED_SLOTS_KEY);
+    // Carica password
     const savedPassword = localStorage.getItem(PASSWORD_KEY);
-    
-    if (savedAppointments) {
-      setAppointments(JSON.parse(savedAppointments));
-    }
-    if (savedBlockedSlots) {
-      setBlockedSlots(JSON.parse(savedBlockedSlots));
-    }
-    if (!savedPassword) {
-      localStorage.setItem(PASSWORD_KEY, ADMIN_PASSWORD);
-    }
+    if (!savedPassword) localStorage.setItem(PASSWORD_KEY, ADMIN_PASSWORD);
+
+    // Ascolta appuntamenti
+    db.ref('appointments').on('value', snap => {
+      const val = snap.val();
+      setAppointments(val ? Object.values(val) : []);
+    });
+
+    // Ascolta slot bloccati
+    db.ref('blockedSlots').on('value', snap => {
+      const val = snap.val();
+      setBlockedSlots(val ? Object.values(val) : []);
+    });
+
+    // Ascolta impostazioni
+    db.ref('settings').once('value').then(snap => {
+      if (!snap.val()) {
+        // Prima volta: scrivi i valori default su Firebase
+        db.ref('settings').set(DEFAULT_SETTINGS);
+      }
+    });
+    db.ref('settings').on('value', snap => {
+      const val = snap.val();
+      if (val) {
+        setSettings(val);
+        setTempSettings(val);
+      }
+    });
+
+    // Ascolta domande
+    db.ref('questions').on('value', snap => {
+      const val = snap.val();
+      setQuestions(val ? Object.values(val).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)) : []);
+    });
+
+    setDbReady(true);
+
+    return () => {
+      db.ref('appointments').off();
+      db.ref('blockedSlots').off();
+      db.ref('settings').off();
+      db.ref('questions').off();
+    };
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-  }, [appointments]);
+  // ─── SERVICES (dinamici dalle impostazioni) ──────────────────────────────────
+  const SERVICES = {
+    individual: { name: 'Seduta Individuale Online', duration: settings.durationIndividual, price: settings.priceIndividual, icon: User },
+    couple: { name: 'Seduta di Coppia Online', duration: settings.durationCouple, price: settings.priceCouple, icon: Users }
+  };
 
-  useEffect(() => {
-    localStorage.setItem(BLOCKED_SLOTS_KEY, JSON.stringify(blockedSlots));
-  }, [blockedSlots]);
+  // ─── SLOT GENERATOR (dinamico dagli orari) ───────────────────────────────────
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = settings.scheduleStart; hour < settings.scheduleEnd; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      if (hour < settings.scheduleEnd - 1) slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+    return slots;
+  };
 
+  // ─── CALENDARIO ──────────────────────────────────────────────────────────────
   const getWeekDays = (startDate) => {
     const days = [];
     const current = new Date(startDate);
-    for (let i = 0; i < 7; i++) {
-      days.push(new Date(current));
-      current.setDate(current.getDate() + 1);
-    }
+    for (let i = 0; i < 7; i++) { days.push(new Date(current)); current.setDate(current.getDate() + 1); }
     return days;
   };
+  const nextWeek = () => { const d = new Date(currentWeekStart); d.setDate(d.getDate() + 7); setCurrentWeekStart(d); };
+  const prevWeek = () => { const d = new Date(currentWeekStart); d.setDate(d.getDate() - 7); setCurrentWeekStart(d); };
 
-  const nextWeek = () => {
-    const newDate = new Date(currentWeekStart);
-    newDate.setDate(newDate.getDate() + 7);
-    setCurrentWeekStart(newDate);
-  };
-
-  const prevWeek = () => {
-    const newDate = new Date(currentWeekStart);
-    newDate.setDate(newDate.getDate() - 7);
-    setCurrentWeekStart(newDate);
-  };
-
-  const isSlotBlocked = (date, time) => {
-    return blockedSlots.some(
-      slot => slot.date === formatDate(date) && slot.time === time
-    );
-  };
-
-  const isSlotBooked = (date, time) => {
-    return appointments.some(
-      apt => apt.date === formatDate(date) && apt.time === time
-    );
-  };
-
-  const timeToMinutes = (time) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
+  const isSlotBlocked = (date, time) => blockedSlots.some(s => s.date === formatDate(date) && s.time === time);
+  const isSlotBooked = (date, time) => appointments.some(a => a.date === formatDate(date) && a.time === time);
+  const timeToMinutes = (time) => { const [h, m] = time.split(':').map(Number); return h * 60 + m; };
   const isSlotOccupiedByDuration = (date, time) => {
     const dateStr = formatDate(date);
-    const slotMinutes = timeToMinutes(time);
-    
+    const slotMin = timeToMinutes(time);
     return appointments.some(apt => {
       if (apt.date !== dateStr) return false;
-      
-      const aptStartMinutes = timeToMinutes(apt.time);
-      const aptEndMinutes = aptStartMinutes + 50;
-      const slotEndMinutes = slotMinutes + 50;
-      
-      return (
-        (slotMinutes >= aptStartMinutes && slotMinutes < aptEndMinutes) ||
-        (slotEndMinutes > aptStartMinutes && slotEndMinutes <= aptEndMinutes) ||
-        (slotMinutes <= aptStartMinutes && slotEndMinutes >= aptEndMinutes)
-      );
+      const aptStart = timeToMinutes(apt.time);
+      const aptEnd = aptStart + apt.duration;
+      const slotEnd = slotMin + 50;
+      return (slotMin >= aptStart && slotMin < aptEnd) || (slotEnd > aptStart && slotEnd <= aptEnd) || (slotMin <= aptStart && slotEnd >= aptEnd);
     });
   };
-
   const getAvailableSlots = (date) => {
-    const dateStr = formatDate(date);
-    const allSlots = generateTimeSlots();
-    
-    return allSlots.map(time => {
+    const dayOfWeek = date.getDay();
+    if (!settings.availableDays.includes(dayOfWeek)) return generateTimeSlots().map(time => ({ time, available: false, blocked: false, booked: false }));
+    return generateTimeSlots().map(time => {
       const blocked = isSlotBlocked(date, time);
       const booked = isSlotBooked(date, time);
-      const occupiedByDuration = isSlotOccupiedByDuration(date, time);
-      
-      return {
-        time,
-        available: !blocked && !booked && !occupiedByDuration,
-        blocked,
-        booked: booked || occupiedByDuration
-      };
+      const occupied = isSlotOccupiedByDuration(date, time);
+      return { time, available: !blocked && !booked && !occupied, blocked, booked: booked || occupied };
     });
   };
 
+  // ─── AUTH ────────────────────────────────────────────────────────────────────
   const handleLogin = () => {
-    const savedPassword = localStorage.getItem(PASSWORD_KEY) || ADMIN_PASSWORD;
-    if (passwordInput === savedPassword) {
-      setIsAdmin(true);
-      setShowPasswordModal(false);
-      setPasswordInput('');
-    } else {
-      alert('Password errata');
-    }
+    const savedPwd = localStorage.getItem(PASSWORD_KEY) || ADMIN_PASSWORD;
+    if (passwordInput === savedPwd) { setIsAdmin(true); setShowPasswordModal(false); setPasswordInput(''); }
+    else alert('Password errata');
   };
-
   const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
-      alert('Le password non coincidono');
-      return;
-    }
-    if (newPassword.length < 8) {
-      alert('La password deve essere di almeno 8 caratteri');
-      return;
-    }
-    
+    if (newPassword !== confirmPassword) { alert('Le password non coincidono'); return; }
+    if (newPassword.length < 8) { alert('La password deve essere di almeno 8 caratteri'); return; }
     localStorage.setItem(PASSWORD_KEY, newPassword);
     alert('✅ Password cambiata con successo!');
-    setShowChangePasswordModal(false);
-    setNewPassword('');
-    setConfirmPassword('');
+    setShowChangePasswordModal(false); setNewPassword(''); setConfirmPassword('');
   };
 
+  // ─── PRENOTAZIONE ────────────────────────────────────────────────────────────
   const bookAppointment = async () => {
     if (!selectedService || !selectedDate || !selectedTime || !patientName || !patientEmail || !patientPhone || !selectedPlatform) {
-      alert('Compila tutti i campi per prenotare');
-      return;
+      alert('Compila tutti i campi per prenotare'); return;
     }
-
-    if (!consentAccepted) {
-      alert('⚠️ Devi accettare il consenso informato per procedere con la prenotazione.');
-      return;
+    if (!consentAccepted) { alert('⚠️ Devi accettare il consenso informato per procedere con la prenotazione.'); return; }
+    if (isSlotBooked(selectedDate, selectedTime) || isSlotBlocked(selectedDate, selectedTime) || isSlotOccupiedByDuration(selectedDate, selectedTime)) {
+      alert('Questo slot non è più disponibile.'); return;
     }
-
-    if (isSlotBooked(selectedDate, selectedTime) || 
-        isSlotBlocked(selectedDate, selectedTime) || 
-        isSlotOccupiedByDuration(selectedDate, selectedTime)) {
-      alert('Questo slot non è più disponibile.');
-      return;
-    }
-
     const newAppointment = {
       id: Date.now(),
       date: formatDate(selectedDate),
@@ -501,770 +439,762 @@ function AppointmentSystem() {
       serviceType: selectedService,
       serviceName: SERVICES[selectedService].name,
       price: SERVICES[selectedService].price,
+      duration: SERVICES[selectedService].duration,
       platform: selectedPlatform,
-      patientName,
-      patientEmail,
-      patientPhone,
+      patientName, patientEmail, patientPhone,
       status: 'confirmed',
       createdAt: new Date().toISOString()
     };
+    await db.ref('appointments/' + newAppointment.id).set(newAppointment);
 
-    const updatedAppointments = [...appointments, newAppointment];
-    setAppointments(updatedAppointments);
-    
-    const emailSent = await sendEmailNotification(newAppointment);
-    
+    // Notifica Telegram
+    const telegramMsg = `🗓 <b>Nuova Prenotazione!</b>\n\n👤 <b>Paziente:</b> ${patientName}\n📧 Email: ${patientEmail}\n📱 Tel: ${patientPhone}\n\n📋 <b>Servizio:</b> ${SERVICES[selectedService].name}\n🖥 <b>Piattaforma:</b> ${PLATFORMS[selectedPlatform].name}\n📅 <b>Data:</b> ${formatDisplayDate(formatDate(selectedDate))}\n⏰ <b>Orario:</b> ${selectedTime}\n💶 <b>Prezzo:</b> €${SERVICES[selectedService].price}`;
+    await sendTelegramNotification(telegramMsg);
+
     setShowConfirmation(true);
-    
     setTimeout(() => {
-      setSelectedService(null);
-      setSelectedDate(new Date());
-      setSelectedTime(null);
-      setSelectedPlatform(null);
-      setPatientName('');
-      setPatientEmail('');
-      setPatientPhone('');
-      setConsentAccepted(false);
-      setShowConfirmation(false);
+      setSelectedService(null); setSelectedDate(new Date()); setSelectedTime(null);
+      setSelectedPlatform(null); setPatientName(''); setPatientEmail('');
+      setPatientPhone(''); setConsentAccepted(false); setShowConfirmation(false);
     }, 5000);
   };
 
+  // ─── GESTIONE APPUNTAMENTI ───────────────────────────────────────────────────
   const deleteAppointment = (id) => {
-    const appointment = appointments.find(apt => apt.id === id);
-    
-    if (!canCancelAppointment(appointment.date, appointment.time)) {
-      if (confirm('⚠️ Questo appuntamento è tra meno di 24 ore.\n\nLe cancellazioni devono essere effettuate con almeno 24 ore di anticipo.\n\nVuoi procedere comunque con la cancellazione? (Contatteremo il paziente)')) {
-        setAppointments(appointments.filter(apt => apt.id !== id));
+    const apt = appointments.find(a => a.id === id);
+    if (!canCancelAppointment(apt.date, apt.time)) {
+      if (confirm('⚠️ Questo appuntamento è tra meno di 24 ore.\nVuoi procedere comunque con la cancellazione?')) {
+        await db.ref('appointments/' + id).remove();
         alert('✅ Appuntamento cancellato. Ricordati di contattare il paziente.');
       }
       return;
     }
-    
     if (confirm('Sei sicuro di voler cancellare questo appuntamento?')) {
-      setAppointments(appointments.filter(apt => apt.id !== id));
+      await db.ref('appointments/' + id).remove();
       alert('✅ Appuntamento cancellato con successo.');
     }
   };
-
-  const startEditAppointment = (appointment) => {
-    setEditingAppointment(appointment);
-    setSelectedDate(new Date(appointment.date + 'T00:00:00'));
-    setSelectedTime(appointment.time);
+  const startEditAppointment = (apt) => {
+    setEditingAppointment(apt);
+    setSelectedDate(new Date(apt.date + 'T00:00:00'));
+    setSelectedTime(apt.time);
   };
-
   const saveEditAppointment = () => {
-    if (!selectedTime) {
-      alert('Seleziona un nuovo orario');
-      return;
-    }
-
-    const updatedAppointments = appointments.map(apt => 
-      apt.id === editingAppointment.id 
-        ? { ...apt, date: formatDate(selectedDate), time: selectedTime }
-        : apt
-    );
-    
-    setAppointments(updatedAppointments);
-    setEditingAppointment(null);
-    setSelectedTime(null);
+    if (!selectedTime) { alert('Seleziona un nuovo orario'); return; }
+    await db.ref('appointments/' + editingAppointment.id).update({ date: formatDate(selectedDate), time: selectedTime });
+    setEditingAppointment(null); setSelectedTime(null);
     alert('✅ Appuntamento modificato. Ricordati di avvisare il paziente.');
   };
 
+  // ─── SLOT BLOCCO ─────────────────────────────────────────────────────────────
   const blockTimeSlot = () => {
-    if (!blockSlotDate || !blockSlotTime) {
-      alert('Seleziona data e orario');
-      return;
-    }
+    if (!blockSlotDate || !blockSlotTime) { alert('Seleziona data e orario'); return; }
+    const newSlot = { id: Date.now(), date: blockSlotDate, time: blockSlotTime, reason: blockSlotReason || 'Impegno personale' };
+    await db.ref('blockedSlots/' + newSlot.id).set(newSlot);
+    setShowBlockSlotModal(false); setBlockSlotDate(''); setBlockSlotTime(''); setBlockSlotReason('');
+  };
+  const unblockTimeSlot = (id) => { if (confirm('Vuoi sbloccare questo slot?')) { await db.ref('blockedSlots/' + id).remove(); } };
 
-    const newBlockedSlot = {
+  // ─── DOMANDE ANONIME ─────────────────────────────────────────────────────────
+  const submitQuestion = async () => {
+    if (!questionText.trim()) { alert('Scrivi la tua domanda prima di inviare'); return; }
+    const newQuestion = {
       id: Date.now(),
-      date: blockSlotDate,
-      time: blockSlotTime,
-      reason: blockSlotReason || 'Impegno personale'
+      nickname: questionNickname.trim() || 'Anonimo',
+      text: questionText.trim(),
+      createdAt: new Date().toISOString(),
+      answer: null,
+      answeredAt: null
     };
-
-    setBlockedSlots([...blockedSlots, newBlockedSlot]);
-    setShowBlockSlotModal(false);
-    setBlockSlotDate('');
-    setBlockSlotTime('');
-    setBlockSlotReason('');
+    await db.ref('questions/' + newQuestion.id).set(newQuestion);
+    await sendTelegramNotification(`❓ <b>Nuova Domanda Anonima</b>\n\n👤 <b>Da:</b> ${newQuestion.nickname}\n\n💬 <b>Domanda:</b>\n${newQuestion.text}`);
+    setQuestionText(''); setQuestionNickname(''); setQuestionSent(true);
+    setTimeout(() => setQuestionSent(false), 4000);
   };
 
-  const unblockTimeSlot = (id) => {
-    if (confirm('Vuoi sbloccare questo slot?')) {
-      setBlockedSlots(blockedSlots.filter(slot => slot.id !== id));
-    }
+  const submitReply = (questionId) => {
+    if (!replyText.trim()) { alert('Scrivi una risposta'); return; }
+    await db.ref('questions/' + questionId).update({ answer: replyText.trim(), answeredAt: new Date().toISOString() });
+    setReplyingTo(null); setReplyText('');
   };
 
-  // Vista Paziente
-  const PatientView = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Dr. Vittorio Penzo</h1>
-        <p className="text-gray-600">Psicologo - Sedute Online</p>
-        
-        <div className="flex gap-3 justify-center mt-4">
-          <button
-            onClick={() => setShowFAQ(!showFAQ)}
-            className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center gap-2 text-sm"
-          >
-            <MessageCircle className="w-4 h-4" />
-            Domande Frequenti
-          </button>
-          <button
-            onClick={() => setShowTestimonials(!showTestimonials)}
-            className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center gap-2 text-sm"
-          >
-            <Star className="w-4 h-4" />
-            Testimonianze
-          </button>
-        </div>
-      </div>
+  const deleteQuestion = (id) => {
+    if (confirm('Eliminare questa domanda?')) { await db.ref('questions/' + id).remove(); }
+  };
 
-      {showFAQ && (
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <MessageCircle className="w-6 h-6 text-blue-600" />
-              Domande Frequenti
-            </h3>
-            <button onClick={() => setShowFAQ(false)} className="text-gray-500 hover:text-gray-700">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {FAQ_DATA.map((faq, idx) => (
-              <div key={idx} className="bg-white rounded-lg border border-blue-200">
-                <button
-                  onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)}
-                  className="w-full text-left p-4 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg flex items-center justify-between"
-                >
-                  {faq.question}
-                  <span className="text-blue-600">{expandedFAQ === idx ? '−' : '+'}</span>
-                </button>
-                {expandedFAQ === idx && (
-                  <div className="px-4 pb-4 text-gray-600 text-sm">
-                    {faq.answer}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+  // ─── SALVA IMPOSTAZIONI ──────────────────────────────────────────────────────
+  const saveSettings = async () => {
+    await db.ref('settings').set(tempSettings);
+    alert('✅ Impostazioni salvate! Le modifiche sono ora visibili ai pazienti.');
+  };
 
-      {showTestimonials && (
-        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <Star className="w-6 h-6 text-green-600" filled />
-              Cosa dicono i pazienti
-            </h3>
-            <button onClick={() => setShowTestimonials(false)} className="text-gray-500 hover:text-gray-700">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="space-y-4">
-            {TESTIMONIALS.map((testimonial, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-4 border border-green-200">
-                <div className="flex items-center gap-2 mb-2">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-500" filled />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-2 italic">"{testimonial.text}"</p>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-gray-800">{testimonial.name}</span>
-                  <span className="text-gray-500">{testimonial.date}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div>
-        <label className="block text-lg font-semibold text-gray-700 mb-4">
-          1. Seleziona il tipo di seduta
-        </label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.entries(SERVICES).map(([key, service]) => {
-            const Icon = service.icon;
-            return (
-              <div
-                key={key}
-                onClick={() => {
-                  setSelectedService(key);
-                  setSelectedTime(null);
-                }}
-                className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
-                  selectedService === key
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800 text-lg mb-1">{service.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{service.duration} minuti</p>
-                    <p className="text-2xl font-bold text-blue-600">€{service.price}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {selectedService && (
-        <>
-          <div>
-            <label className="block text-lg font-semibold text-gray-700 mb-4">
-              2. Scegli la piattaforma per la videochiamata
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Object.entries(PLATFORMS).map(([key, platform]) => {
-                const Icon = platform.icon;
-                return (
-                  <div
-                    key={key}
-                    onClick={() => setSelectedPlatform(key)}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      selectedPlatform === key
-                        ? 'border-green-500 bg-green-50'
-                        : 'border-gray-200 hover:border-green-300'
-                    }`}
-                  >
-                    <div className="flex flex-col items-center gap-2">
-                      <Icon className="w-8 h-8 text-green-600" />
-                      <span className="font-semibold text-gray-800">{platform.name}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Riceverai il link per la videochiamata via email 24 ore prima dell'appuntamento
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-lg font-semibold text-gray-700 mb-4">
-              3. Seleziona la data
-            </label>
-            <div className="bg-white border rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <button onClick={prevWeek} className="p-2 hover:bg-gray-100 rounded">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <h3 className="font-semibold text-lg">
-                  {currentWeekStart.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}
-                </h3>
-                <button onClick={nextWeek} className="p-2 hover:bg-gray-100 rounded">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-7 gap-2">
-                {getWeekDays(currentWeekStart).map((day, idx) => {
-                  const dateStr = formatDate(day);
-                  const slots = getAvailableSlots(day);
-                  const availableCount = slots.filter(s => s.available).length;
-                  const isSelected = formatDate(selectedDate) === dateStr;
-                  const isPast = day < new Date().setHours(0, 0, 0, 0);
-                  const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-                  const within24h = isWithin24Hours(day);
-                  
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => {
-                        if (!isPast && !isWeekend && availableCount > 0) {
-                          if (within24h) {
-                            alert('⚠️ Le prenotazioni devono essere effettuate con almeno 24 ore di anticipo.');
-                            return;
-                          }
-                          setSelectedDate(day);
-                          setSelectedTime(null);
-                        }
-                      }}
-                      className={`p-3 text-center rounded-lg cursor-pointer transition-all ${
-                        isPast || isWeekend || within24h
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : isSelected
-                          ? 'bg-blue-500 text-white'
-                          : availableCount > 0
-                          ? 'border-2 border-gray-200 hover:border-blue-300'
-                          : 'border border-gray-200 text-gray-400'
-                      }`}
-                    >
-                      <div className="text-xs font-medium">
-                        {day.toLocaleDateString('it-IT', { weekday: 'short' })}
-                      </div>
-                      <div className="text-lg font-bold mt-1">
-                        {day.getDate()}
-                      </div>
-                      {within24h && !isPast && (
-                        <div className="text-xs mt-1 text-red-500">
-                          &lt;24h
-                        </div>
-                      )}
-                      {availableCount > 0 && !isPast && !isWeekend && !within24h && (
-                        <div className="text-xs mt-1">
-                          {availableCount} slot
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-xs text-gray-500 mt-3">
-                ⏰ <strong>Importante:</strong> Le prenotazioni richiedono almeno 24 ore di anticipo
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-lg font-semibold text-gray-700 mb-4">
-              4. Seleziona l'orario - {formatDisplayDate(formatDate(selectedDate))}
-            </label>
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-              {getAvailableSlots(selectedDate).map(slot => (
-                <button
-                  key={slot.time}
-                  onClick={() => slot.available && setSelectedTime(slot.time)}
-                  disabled={!slot.available}
-                  className={`p-4 rounded-lg font-medium transition-all ${
-                    selectedTime === slot.time
-                      ? 'bg-blue-500 text-white'
-                      : slot.available
-                      ? 'bg-white border-2 border-gray-200 hover:border-blue-300 text-gray-700'
-                      : 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <Clock className="w-5 h-5 mx-auto mb-1" />
-                  {slot.time}
-                  {!slot.available && (
-                    <div className="text-xs mt-1">
-                      {slot.blocked ? 'Non disp.' : 'Occupato'}
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-3">
-              💡 Le sedute durano 50 minuti. Gli slot vicini a prenotazioni esistenti potrebbero risultare non disponibili.
-            </p>
-          </div>
-
-          {selectedTime && selectedPlatform && (
-            <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">5. I tuoi dati</h3>
-              <form onSubmit={(e) => e.preventDefault()}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nome e Cognome *
-                  </label>
-                  <input
-                    type="text"
-                    value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
-                    autoComplete="off"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Mario Rossi"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={patientEmail}
-                    onChange={(e) => setPatientEmail(e.target.value)}
-                    autoComplete="off"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="mario.rossi@email.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Telefono *
-                  </label>
-                  <input
-                    type="tel"
-                    value={patientPhone}
-                    onChange={(e) => setPatientPhone(e.target.value)}
-                    autoComplete="off"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="+39 123 456 7890"
-                  />
-                </div>
-
-                <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800 mb-2">Consenso Informato Obbligatorio</h4>
-                      <p className="text-sm text-gray-700 mb-3">
-                        Prima di prenotare, è necessario leggere e accettare il consenso informato.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setShowConsentModal(true)}
-                        className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2 text-sm"
-                      >
-                        <FileText className="w-4 h-4" />
-                        Leggi il Consenso Informato
-                      </button>
-                      
-                      <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={consentAccepted}
-                          onChange={(e) => setConsentAccepted(e.target.checked)}
-                          className="w-5 h-5 text-blue-600"
-                        />
-                        <span className="text-sm font-medium text-gray-800">
-                          Ho letto e accetto il consenso informato
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg border-2 border-blue-200">
-                  <h4 className="font-semibold text-gray-800 mb-3">Riepilogo Prenotazione</h4>
-                  <div className="space-y-2 text-sm">
-                    <p><strong>Servizio:</strong> {SERVICES[selectedService].name}</p>
-                    <p><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform].name}</p>
-                    <p><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
-                    <p><strong>Orario:</strong> {selectedTime}</p>
-                    <p><strong>Durata:</strong> {SERVICES[selectedService].duration} minuti</p>
-                    <p className="text-lg font-bold text-blue-600 pt-2">
-                      Costo: €{SERVICES[selectedService].price}
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={bookAppointment}
-                  disabled={!consentAccepted}
-                  className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${
-                    consentAccepted
-                      ? 'bg-blue-500 text-white hover:bg-blue-600'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  <Check className="w-6 h-6" />
-                  Conferma Prenotazione
-                </button>
-
-                <p className="text-xs text-gray-500 text-center">
-                  Riceverai un'email di conferma con il link per la videochiamata
-                </p>
-              </div>
-              </form>
-            </div>
-          )}
-        </>
-      )}
-{showConsentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-gray-800">Consenso Informato</h3>
-              <button onClick={() => setShowConsentModal(false)} className="text-gray-500 hover:text-gray-700">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
-              <p className="font-semibold">Dr. Vittorio Penzo - Psicologo</p>
-              <p>Borgo Pace 5, Parma</p>
-              <p>C.F. PNZVTR94A13D086W - P.I. 03729090781</p>
-              <p>Albo Psicologi: 10513A PR</p>
-              
-              <h4 className="font-bold text-lg mt-6">Informazioni sulla prestazione professionale</h4>
-              
-              <p><strong>Tipo di prestazione:</strong> Colloquio psicologico online</p>
-              
-              <p><strong>Finalità:</strong> La prestazione è finalizzata ad attività professionali di promozione e tutela della salute e del benessere.</p>
-              
-              <p><strong>Strumenti utilizzati:</strong> Colloquio clinico, questionari, test (se necessario).</p>
-              
-              <p><strong>Durata:</strong> La durata globale dell'intervento non è definibile a priori. Obiettivi e tempi saranno comunicati e concordati verbalmente durante il percorso.</p>
-              
-              <h4 className="font-bold text-lg mt-6">Diritti del paziente</h4>
-              
-              <ul className="list-disc pl-6 space-y-2">
-                <li>È possibile interrompere il rapporto in qualsiasi momento comunicando al professionista la volontà di interruzione.</li>
-                <li>Il professionista può proporre l'interruzione quando constata che non vi sia alcun beneficio dall'intervento.</li>
-                <li>In caso di mancato rispetto dell'appuntamento senza preavviso di almeno 24 ore, il paziente si impegna a saldare comunque il corrispettivo previsto.</li>
-              </ul>
-              
-              <h4 className="font-bold text-lg mt-6">Tariffe</h4>
-              
-              <p><strong>Seduta individuale online:</strong> €65 (sessantacinque) + ENPAP 2%</p>
-              <p><strong>Seduta di coppia online:</strong> €75 (settantacinque) + ENPAP 2%</p>
-              
-              <p className="text-sm italic">Il compenso non può essere condizionato all'esito o ai risultati dell'intervento professionale.</p>
-              
-              <h4 className="font-bold text-lg mt-6">Modalità di pagamento</h4>
-              
-              <p>Il pagamento dovrà avvenire entro una settimana dalla ricezione della fattura tramite bonifico bancario.</p>
-              <p className="text-sm">Per detrarre la spesa, il pagamento deve avvenire tramite modalità tracciabile (no contanti).</p>
-              
-              <h4 className="font-bold text-lg mt-6">Trattamento dei dati personali (GDPR)</h4>
-              
-              <p>Il Dr. Vittorio Penzo è Titolare del trattamento dei dati personali raccolti, che includono:</p>
-              
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Dati anagrafici, di contatto e di pagamento</li>
-                <li>Dati relativi allo stato di salute fisica o mentale</li>
-              </ul>
-              
-              <p>I dati saranno:</p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>Trattati con modalità cartacee ed elettroniche</li>
-                <li>Protetti con adeguate misure di sicurezza</li>
-                <li>Conservati per il tempo necessario (minimo 5 anni per dati sanitari)</li>
-                <li>Resi accessibili solo su richiesta delle Autorità competenti o con consenso esplicito del paziente</li>
-              </ul>
-              
-              <h4 className="font-bold text-lg mt-6">Diritti dell'interessato</h4>
-              
-              <p>L'interessato può esercitare i diritti di accesso, rettifica, cancellazione, limitazione del trattamento e portabilità dei dati secondo quanto previsto dagli articoli 15-22 del GDPR.</p>
-              
-              <p className="mt-4 text-sm">Per reclami: Garante per la protezione dei dati personali - Piazza Venezia 11, 00187 Roma</p>
-              <p className="text-sm">Email: garante@gpdp.it - PEC: protocollo@pec.gpdp.it</p>
-            </div>
-            
-            <div className="mt-6 flex gap-3">
-              <button
-                onClick={() => {
-                  setConsentAccepted(true);
-                  setShowConsentModal(false);
-                }}
-                className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600"
-              >
-                Ho letto e accetto
-              </button>
-              <button
-                onClick={() => setShowConsentModal(false)}
-                className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300"
-              >
-                Chiudi
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-10 h-10 text-green-600" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">Prenotazione Confermata!</h3>
-            <p className="text-gray-600 mb-4">
-              Grazie {patientName}! Riceverai un'email di conferma a {patientEmail} con il link per la videochiamata su {PLATFORMS[selectedPlatform]?.name}.
-            </p>
-            <div className="bg-gray-50 p-4 rounded-lg text-left">
-              <p className="text-sm mb-1"><strong>Servizio:</strong> {SERVICES[selectedService]?.name}</p>
-              <p className="text-sm mb-1"><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform]?.name}</p>
-              <p className="text-sm mb-1"><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
-              <p className="text-sm mb-1"><strong>Orario:</strong> {selectedTime}</p>
-              <p className="text-sm font-bold text-blue-600 mt-2">€{SERVICES[selectedService]?.price}</p>
-            </div>
-            <p className="text-xs text-gray-500 mt-4">
-              📧 Riceverai un promemoria 24 ore prima dell'appuntamento
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const ProfessionalView = () => {
-    const today = new Date();
-    const futureAppointments = appointments
-      .filter(apt => new Date(apt.date) >= today)
-      .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+  // ════════════════════════════════════════════════════════════════════════════
+  // VISTA PAZIENTE
+  // ════════════════════════════════════════════════════════════════════════════
+  const PatientView = () => {
+    const answeredQuestions = questions.filter(q => q.answer);
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
-          <button
-            onClick={() => setIsAdmin(false)}
-            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-          >
-            Esci
-          </button>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Dr. Vittorio Penzo</h1>
+          <p className="text-gray-600">Psicologo - Sedute Online</p>
+          <div className="flex gap-3 justify-center mt-4 flex-wrap">
+            <button onClick={() => setShowFAQ(!showFAQ)} className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 flex items-center gap-2 text-sm">
+              <MessageCircle className="w-4 h-4" /> Domande Frequenti
+            </button>
+            <button onClick={() => setShowTestimonials(!showTestimonials)} className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center gap-2 text-sm">
+              <Star className="w-4 h-4" /> Testimonianze
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => setShowBlockSlotModal(true)}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2"
-          >
-            <Lock className="w-4 h-4" />
-            Blocca Slot
-          </button>
-          <button
-            onClick={() => exportToCSV(appointments)}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Esporta in Excel
-          </button>
-          <button
-            onClick={() => setShowChangePasswordModal(true)}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center gap-2"
-          >
-            <Lock className="w-4 h-4" />
-            Cambia Password
-          </button>
-        </div>
-
-        {blockedSlots.length > 0 && (
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-3">Slot Bloccati ({blockedSlots.length})</h3>
-            <div className="space-y-2">
-              {blockedSlots.map(slot => (
-                <div key={slot.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">{formatDisplayDate(slot.date)} - {slot.time}</p>
-                    <p className="text-sm text-gray-600">{slot.reason}</p>
-                  </div>
-                  <button
-                    onClick={() => unblockTimeSlot(slot.id)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded"
-                    title="Sblocca slot"
-                  >
-                    <X className="w-5 h-5" />
+        {showFAQ && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2"><MessageCircle className="w-6 h-6 text-blue-600" /> Domande Frequenti</h3>
+              <button onClick={() => setShowFAQ(false)} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-3">
+              {FAQ_DATA.map((faq, idx) => (
+                <div key={idx} className="bg-white rounded-lg border border-blue-200">
+                  <button onClick={() => setExpandedFAQ(expandedFAQ === idx ? null : idx)} className="w-full text-left p-4 font-semibold text-gray-800 hover:bg-blue-50 rounded-lg flex items-center justify-between">
+                    {faq.question} <span className="text-blue-600">{expandedFAQ === idx ? '−' : '+'}</span>
                   </button>
+                  {expandedFAQ === idx && <div className="px-4 pb-4 text-gray-600 text-sm">{faq.answer}</div>}
                 </div>
               ))}
             </div>
           </div>
         )}
 
+        {showTestimonials && (
+          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Star className="w-6 h-6 text-green-600" filled /> Cosa dicono i pazienti</h3>
+              <button onClick={() => setShowTestimonials(false)} className="text-gray-500 hover:text-gray-700"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="space-y-4">
+              {TESTIMONIALS.map((t, idx) => (
+                <div key={idx} className="bg-white rounded-lg p-4 border border-green-200">
+                  <div className="flex items-center gap-2 mb-2">{[...Array(t.rating)].map((_, i) => <Star key={i} className="w-4 h-4 text-yellow-500" filled />)}</div>
+                  <p className="text-gray-700 mb-2 italic">"{t.text}"</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-semibold text-gray-800">{t.name}</span>
+                    <span className="text-gray-500">{t.date}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Selezione servizio */}
         <div>
-          <h3 className="font-semibold text-gray-800 mb-3">
-            Prossimi Appuntamenti ({futureAppointments.length})
-          </h3>
-          <div className="space-y-3">
-            {futureAppointments.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <Calendar className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-600">Nessun appuntamento in programma</p>
-              </div>
-            ) : (
-              futureAppointments.map(apt => {
-                const canCancel = canCancelAppointment(apt.date, apt.time);
-                return (
-                  <div key={apt.id} className={`bg-white border-2 rounded-lg p-4 ${!canCancel ? 'border-yellow-300' : 'border-gray-200'}`}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <User className="w-6 h-6 text-blue-600" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-gray-800 text-lg">{apt.patientName}</h3>
-                            <p className="text-sm text-gray-600">{apt.patientEmail}</p>
-                            <p className="text-sm text-gray-600">{apt.patientPhone}</p>
-                          </div>
-                        </div>
-                        <div className="ml-15 space-y-1 bg-gray-50 p-3 rounded">
-                          <p className="text-sm"><strong>Servizio:</strong> {apt.serviceName}</p>
-                          <p className="text-sm"><strong>Piattaforma:</strong> {PLATFORMS[apt.platform]?.name || 'N/D'}</p>
-                          <p className="text-sm"><strong>Data:</strong> {formatDisplayDate(apt.date)}</p>
-                          <p className="text-sm"><strong>Orario:</strong> {apt.time}</p>
-                          <p className="text-sm font-bold text-blue-600">€{apt.price}</p>
-                          {!canCancel && (
-                            <p className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded mt-2">
-                              ⚠️ Appuntamento tra meno di 24 ore
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <button
-                          onClick={() => startEditAppointment(apt)}
-                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"
-                          title="Modifica appuntamento"
-                        >
-                          <Edit className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => deleteAppointment(apt.id)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                          title="Cancella appuntamento"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
+          <label className="block text-lg font-semibold text-gray-700 mb-4">1. Seleziona il tipo di seduta</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(SERVICES).map(([key, service]) => {
+              const Icon = service.icon;
+              return (
+                <div key={key} onClick={() => { setSelectedService(key); setSelectedTime(null); }}
+                  className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${selectedService === key ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 text-lg mb-1">{service.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{service.duration} minuti</p>
+                      <p className="text-2xl font-bold text-blue-600">€{service.price}</p>
                     </div>
                   </div>
-                );
-              })
-            )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
+        {selectedService && (
+          <>
+            {/* Piattaforma */}
+            <div>
+              <label className="block text-lg font-semibold text-gray-700 mb-4">2. Scegli la piattaforma per la videochiamata</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {Object.entries(PLATFORMS).map(([key, platform]) => {
+                  const Icon = platform.icon;
+                  return (
+                    <div key={key} onClick={() => setSelectedPlatform(key)}
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${selectedPlatform === key ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'}`}>
+                      <div className="flex flex-col items-center gap-2">
+                        <Icon className="w-8 h-8 text-green-600" />
+                        <span className="font-semibold text-gray-800">{platform.name}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Riceverai il link per la videochiamata via email 24 ore prima dell'appuntamento</p>
+            </div>
+
+            {/* Calendario */}
+            <div>
+              <label className="block text-lg font-semibold text-gray-700 mb-4">3. Seleziona la data</label>
+              <div className="bg-white border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <button onClick={prevWeek} className="p-2 hover:bg-gray-100 rounded"><ChevronLeft className="w-5 h-5" /></button>
+                  <h3 className="font-semibold text-lg">{currentWeekStart.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' })}</h3>
+                  <button onClick={nextWeek} className="p-2 hover:bg-gray-100 rounded"><ChevronRight className="w-5 h-5" /></button>
+                </div>
+                <div className="grid grid-cols-7 gap-2">
+                  {getWeekDays(currentWeekStart).map((day, idx) => {
+                    const dateStr = formatDate(day);
+                    const slots = getAvailableSlots(day);
+                    const availableCount = slots.filter(s => s.available).length;
+                    const isSelected = formatDate(selectedDate) === dateStr;
+                    const isPast = day < new Date().setHours(0, 0, 0, 0);
+                    const isWeekend = !settings.availableDays.includes(day.getDay());
+                    const within24h = isWithin24Hours(day);
+                    return (
+                      <div key={idx} onClick={() => {
+                        if (!isPast && !isWeekend && availableCount > 0) {
+                          if (within24h) { alert('⚠️ Le prenotazioni devono essere effettuate con almeno 24 ore di anticipo.'); return; }
+                          setSelectedDate(day); setSelectedTime(null);
+                        }
+                      }} className={`p-3 text-center rounded-lg cursor-pointer transition-all ${isPast || isWeekend || within24h ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : isSelected ? 'bg-blue-500 text-white' : availableCount > 0 ? 'border-2 border-gray-200 hover:border-blue-300' : 'border border-gray-200 text-gray-400'}`}>
+                        <div className="text-xs font-medium">{day.toLocaleDateString('it-IT', { weekday: 'short' })}</div>
+                        <div className="text-lg font-bold mt-1">{day.getDate()}</div>
+                        {within24h && !isPast && <div className="text-xs mt-1 text-red-500">&lt;24h</div>}
+                        {availableCount > 0 && !isPast && !isWeekend && !within24h && <div className="text-xs mt-1">{availableCount} slot</div>}
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-3">⏰ <strong>Importante:</strong> Le prenotazioni richiedono almeno 24 ore di anticipo</p>
+              </div>
+            </div>
+
+            {/* Orari */}
+            <div>
+              <label className="block text-lg font-semibold text-gray-700 mb-4">4. Seleziona l'orario - {formatDisplayDate(formatDate(selectedDate))}</label>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                {getAvailableSlots(selectedDate).map(slot => (
+                  <button key={slot.time} onClick={() => slot.available && setSelectedTime(slot.time)} disabled={!slot.available}
+                    className={`p-4 rounded-lg font-medium transition-all ${selectedTime === slot.time ? 'bg-blue-500 text-white' : slot.available ? 'bg-white border-2 border-gray-200 hover:border-blue-300 text-gray-700' : 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'}`}>
+                    <Clock className="w-5 h-5 mx-auto mb-1" />
+                    {slot.time}
+                    {!slot.available && <div className="text-xs mt-1">{slot.blocked ? 'Non disp.' : 'Occupato'}</div>}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-3">💡 Le sedute durano {SERVICES[selectedService]?.duration} minuti. Gli slot vicini a prenotazioni esistenti potrebbero risultare non disponibili.</p>
+            </div>
+
+            {/* Form dati paziente */}
+            {selectedTime && selectedPlatform && (
+              <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">5. I tuoi dati</h3>
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Nome e Cognome *</label>
+                      <input type="text" value={patientName} onChange={(e) => setPatientName(e.target.value)} autoComplete="off" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Mario Rossi" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                      <input type="email" value={patientEmail} onChange={(e) => setPatientEmail(e.target.value)} autoComplete="off" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="mario.rossi@email.com" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Telefono *</label>
+                      <input type="tel" value={patientPhone} onChange={(e) => setPatientPhone(e.target.value)} autoComplete="off" className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="+39 123 456 7890" />
+                    </div>
+                    <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <FileText className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-800 mb-2">Consenso Informato Obbligatorio</h4>
+                          <p className="text-sm text-gray-700 mb-3">Prima di prenotare, è necessario leggere e accettare il consenso informato.</p>
+                          <button type="button" onClick={() => setShowConsentModal(true)} className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 flex items-center gap-2 text-sm">
+                            <FileText className="w-4 h-4" /> Leggi il Consenso Informato
+                          </button>
+                          <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                            <input type="checkbox" checked={consentAccepted} onChange={(e) => setConsentAccepted(e.target.checked)} className="w-5 h-5 text-blue-600" />
+                            <span className="text-sm font-medium text-gray-800">Ho letto e accetto il consenso informato</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg border-2 border-blue-200">
+                      <h4 className="font-semibold text-gray-800 mb-3">Riepilogo Prenotazione</h4>
+                      <div className="space-y-2 text-sm">
+                        <p><strong>Servizio:</strong> {SERVICES[selectedService].name}</p>
+                        <p><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform].name}</p>
+                        <p><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
+                        <p><strong>Orario:</strong> {selectedTime}</p>
+                        <p><strong>Durata:</strong> {SERVICES[selectedService].duration} minuti</p>
+                        <p className="text-lg font-bold text-blue-600 pt-2">Costo: €{SERVICES[selectedService].price}</p>
+                      </div>
+                    </div>
+                    <button onClick={bookAppointment} disabled={!consentAccepted}
+                      className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center gap-2 ${consentAccepted ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+                      <Check className="w-6 h-6" /> Conferma Prenotazione
+                    </button>
+                    <p className="text-xs text-gray-500 text-center">Riceverai un'email di conferma con il link per la videochiamata</p>
+                  </div>
+                </form>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ─── SEZIONE DOMANDE ANONIME ────────────────────────────────────────── */}
+        <div className="mt-10 border-t-2 border-gray-100 pt-8">
+          <div className="flex items-center gap-3 mb-2">
+            <HelpCircle className="w-7 h-7 text-purple-500" />
+            <h2 className="text-2xl font-bold text-gray-800">Hai una domanda?</h2>
+          </div>
+          <p className="text-gray-500 mb-6 text-sm">Puoi fare una domanda in modo anonimo. Il Dr. Penzo risponderà pubblicamente nella sezione qui sotto.</p>
+
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nickname (opzionale)</label>
+                <input type="text" value={questionNickname} onChange={(e) => setQuestionNickname(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent" placeholder="Es: Utente curioso (lascia vuoto per Anonimo)" maxLength={30} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">La tua domanda *</label>
+                <textarea value={questionText} onChange={(e) => setQuestionText(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent resize-none" rows={4} placeholder="Es: Che differenza c'è tra ansia e panico? Come si manifesta il burnout? Cosa si fa in una prima seduta?..." maxLength={500} />
+                <p className="text-xs text-gray-400 mt-1 text-right">{questionText.length}/500</p>
+              </div>
+              {questionSent ? (
+                <div className="bg-green-100 text-green-700 p-3 rounded-lg flex items-center gap-2 font-medium">
+                  <Check className="w-5 h-5" /> Domanda inviata! Il Dr. Penzo risponderà al più presto.
+                </div>
+              ) : (
+                <button onClick={submitQuestion} className="w-full py-3 bg-purple-500 text-white rounded-lg font-semibold hover:bg-purple-600 flex items-center justify-center gap-2">
+                  <Send className="w-5 h-5" /> Invia Domanda
+                </button>
+              )}
+              <p className="text-xs text-gray-400 text-center">⚠️ Non inserire dati personali sensibili. Le domande sono pubbliche una volta risposto.</p>
+            </div>
+          </div>
+
+          {/* Domande con risposta */}
+          {answeredQuestions.length > 0 && (
+            <div>
+              <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                <MessageCircle className="w-5 h-5 text-purple-500" /> Domande & Risposte ({answeredQuestions.length})
+              </h3>
+              <div className="space-y-4">
+                {answeredQuestions.map(q => (
+                  <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <HelpCircle className="w-5 h-5 text-purple-500" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-700 text-sm">{q.nickname}</p>
+                        <p className="text-gray-800 mt-1">{q.text}</p>
+                      </div>
+                    </div>
+                    <div className="ml-12 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg p-4">
+                      <p className="text-xs font-bold text-blue-600 mb-1">🩺 Dr. Vittorio Penzo risponde:</p>
+                      <p className="text-gray-700">{q.answer}</p>
+                      <p className="text-xs text-gray-400 mt-2">{new Date(q.answeredAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modali paziente */}
+        {showConsentModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-bold text-gray-800">Consenso Informato</h3>
+                <button onClick={() => setShowConsentModal(false)} className="text-gray-500 hover:text-gray-700"><X className="w-6 h-6" /></button>
+              </div>
+              <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
+                <p className="font-semibold">Dr. Vittorio Penzo - Psicologo</p>
+                <p>Borgo Pace 5, Parma</p>
+                <p>C.F. PNZVTR94A13D086W - P.I. 03729090781</p>
+                <p>Albo Psicologi: 10513A PR</p>
+                <h4 className="font-bold text-lg mt-6">Informazioni sulla prestazione professionale</h4>
+                <p><strong>Tipo di prestazione:</strong> Colloquio psicologico online</p>
+                <p><strong>Finalità:</strong> La prestazione è finalizzata ad attività professionali di promozione e tutela della salute e del benessere.</p>
+                <p><strong>Strumenti utilizzati:</strong> Colloquio clinico, questionari, test (se necessario).</p>
+                <p><strong>Durata:</strong> La durata globale dell'intervento non è definibile a priori. Obiettivi e tempi saranno comunicati e concordati verbalmente durante il percorso.</p>
+                <h4 className="font-bold text-lg mt-6">Diritti del paziente</h4>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>È possibile interrompere il rapporto in qualsiasi momento comunicando al professionista la volontà di interruzione.</li>
+                  <li>Il professionista può proporre l'interruzione quando constata che non vi sia alcun beneficio dall'intervento.</li>
+                  <li>In caso di mancato rispetto dell'appuntamento senza preavviso di almeno 24 ore, il paziente si impegna a saldare comunque il corrispettivo previsto.</li>
+                </ul>
+                <h4 className="font-bold text-lg mt-6">Tariffe</h4>
+                <p><strong>Seduta individuale online:</strong> €{settings.priceIndividual} + ENPAP 2%</p>
+                <p><strong>Seduta di coppia online:</strong> €{settings.priceCouple} + ENPAP 2%</p>
+                <p className="text-sm italic">Il compenso non può essere condizionato all'esito o ai risultati dell'intervento professionale.</p>
+                <h4 className="font-bold text-lg mt-6">Modalità di pagamento</h4>
+                <p>Il pagamento dovrà avvenire entro una settimana dalla ricezione della fattura tramite bonifico bancario.</p>
+                <p className="text-sm">Per detrarre la spesa, il pagamento deve avvenire tramite modalità tracciabile (no contanti).</p>
+                <h4 className="font-bold text-lg mt-6">Trattamento dei dati personali (GDPR)</h4>
+                <p>Il Dr. Vittorio Penzo è Titolare del trattamento dei dati personali raccolti, che includono:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Dati anagrafici, di contatto e di pagamento</li>
+                  <li>Dati relativi allo stato di salute fisica o mentale</li>
+                </ul>
+                <p>I dati saranno trattati con modalità cartacee ed elettroniche, protetti con adeguate misure di sicurezza, conservati per il tempo necessario (minimo 5 anni per dati sanitari) e resi accessibili solo su richiesta delle Autorità competenti.</p>
+                <h4 className="font-bold text-lg mt-6">Diritti dell'interessato</h4>
+                <p>L'interessato può esercitare i diritti di accesso, rettifica, cancellazione, limitazione del trattamento e portabilità dei dati secondo gli articoli 15-22 del GDPR.</p>
+                <p className="mt-4 text-sm">Per reclami: Garante per la protezione dei dati personali - Piazza Venezia 11, 00187 Roma</p>
+                <p className="text-sm">Email: garante@gpdp.it - PEC: protocollo@pec.gpdp.it</p>
+              </div>
+              <div className="mt-6 flex gap-3">
+                <button onClick={() => { setConsentAccepted(true); setShowConsentModal(false); }} className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600">Ho letto e accetto</button>
+                <button onClick={() => setShowConsentModal(false)} className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300">Chiudi</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="w-10 h-10 text-green-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">Prenotazione Confermata!</h3>
+              <p className="text-gray-600 mb-4">Grazie {patientName}! Riceverai un'email di conferma a {patientEmail} con il link per la videochiamata su {PLATFORMS[selectedPlatform]?.name}.</p>
+              <div className="bg-gray-50 p-4 rounded-lg text-left">
+                <p className="text-sm mb-1"><strong>Servizio:</strong> {SERVICES[selectedService]?.name}</p>
+                <p className="text-sm mb-1"><strong>Piattaforma:</strong> {PLATFORMS[selectedPlatform]?.name}</p>
+                <p className="text-sm mb-1"><strong>Data:</strong> {formatDisplayDate(formatDate(selectedDate))}</p>
+                <p className="text-sm mb-1"><strong>Orario:</strong> {selectedTime}</p>
+                <p className="text-sm font-bold text-blue-600 mt-2">€{SERVICES[selectedService]?.price}</p>
+              </div>
+              <p className="text-xs text-gray-500 mt-4">📧 Riceverai un promemoria 24 ore prima dell'appuntamento</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // VISTA PROFESSIONISTA
+  // ════════════════════════════════════════════════════════════════════════════
+  const ProfessionalView = () => {
+    const today = new Date();
+    const futureAppointments = appointments
+      .filter(apt => new Date(apt.date) >= today)
+      .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+    const pendingQuestions = questions.filter(q => !q.answer);
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
+          <button onClick={() => setIsAdmin(false)} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Esci</button>
+        </div>
+
+        {/* Tab navigation */}
+        <div className="flex gap-2 border-b border-gray-200 pb-0">
+          {[
+            { id: 'appointments', label: '📅 Appuntamenti', badge: futureAppointments.length },
+            { id: 'questions', label: '💬 Domande', badge: pendingQuestions.length },
+            { id: 'settings', label: '⚙️ Impostazioni', badge: null }
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setAdminSection(tab.id)}
+              className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-all ${adminSection === tab.id ? 'bg-white border-2 border-b-white border-gray-200 text-blue-600 -mb-px' : 'text-gray-500 hover:text-gray-700'}`}>
+              {tab.label}
+              {tab.badge > 0 && <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-0.5">{tab.badge}</span>}
+            </button>
+          ))}
+        </div>
+
+        {/* ── TAB APPUNTAMENTI ───────────────────────────────────────────────── */}
+        {adminSection === 'appointments' && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-3">
+              <button onClick={() => setShowBlockSlotModal(true)} className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-2">
+                <Lock className="w-4 h-4" /> Blocca Slot
+              </button>
+              <button onClick={() => exportToCSV(appointments)} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2">
+                <Download className="w-4 h-4" /> Esporta in Excel
+              </button>
+              <button onClick={() => setShowChangePasswordModal(true)} className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center gap-2">
+                <Lock className="w-4 h-4" /> Cambia Password
+              </button>
+            </div>
+
+            {blockedSlots.length > 0 && (
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-3">Slot Bloccati ({blockedSlots.length})</h3>
+                <div className="space-y-2">
+                  {blockedSlots.map(slot => (
+                    <div key={slot.id} className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">{formatDisplayDate(slot.date)} - {slot.time}</p>
+                        <p className="text-sm text-gray-600">{slot.reason}</p>
+                      </div>
+                      <button onClick={() => unblockTimeSlot(slot.id)} className="p-2 text-red-500 hover:bg-red-50 rounded"><X className="w-5 h-5" /></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <h3 className="font-semibold text-gray-800 mb-3">Prossimi Appuntamenti ({futureAppointments.length})</h3>
+              <div className="space-y-3">
+                {futureAppointments.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg">
+                    <Calendar className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-600">Nessun appuntamento in programma</p>
+                  </div>
+                ) : (
+                  futureAppointments.map(apt => {
+                    const canCancel = canCancelAppointment(apt.date, apt.time);
+                    return (
+                      <div key={apt.id} className={`bg-white border-2 rounded-lg p-4 ${!canCancel ? 'border-yellow-300' : 'border-gray-200'}`}>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <User className="w-6 h-6 text-blue-600" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-gray-800 text-lg">{apt.patientName}</h3>
+                                <p className="text-sm text-gray-600">{apt.patientEmail}</p>
+                                <p className="text-sm text-gray-600">{apt.patientPhone}</p>
+                              </div>
+                            </div>
+                            <div className="space-y-1 bg-gray-50 p-3 rounded">
+                              <p className="text-sm"><strong>Servizio:</strong> {apt.serviceName}</p>
+                              <p className="text-sm"><strong>Piattaforma:</strong> {PLATFORMS[apt.platform]?.name || 'N/D'}</p>
+                              <p className="text-sm"><strong>Data:</strong> {formatDisplayDate(apt.date)}</p>
+                              <p className="text-sm"><strong>Orario:</strong> {apt.time}</p>
+                              <p className="text-sm font-bold text-blue-600">€{apt.price}</p>
+                              {!canCancel && <p className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded mt-2">⚠️ Appuntamento tra meno di 24 ore</p>}
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <button onClick={() => startEditAppointment(apt)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg" title="Modifica">
+                              <Edit className="w-5 h-5" />
+                            </button>
+                            <button onClick={() => deleteAppointment(apt.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" title="Cancella">
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB DOMANDE ────────────────────────────────────────────────────── */}
+        {adminSection === 'questions' && (
+          <div className="space-y-4">
+            {questions.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <HelpCircle className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                <p className="text-gray-600">Nessuna domanda ricevuta</p>
+              </div>
+            ) : (
+              <>
+                {pendingQuestions.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      ⏳ In attesa di risposta ({pendingQuestions.length})
+                    </h3>
+                    <div className="space-y-3">
+                      {pendingQuestions.map(q => (
+                        <div key={q.id} className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-5">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <p className="font-semibold text-gray-700 text-sm">👤 {q.nickname}</p>
+                              <p className="text-xs text-gray-400">{new Date(q.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
+                            </div>
+                            <button onClick={() => deleteQuestion(q.id)} className="p-1 text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
+                          </div>
+                          <p className="text-gray-800 mb-4 bg-white p-3 rounded-lg border">{q.text}</p>
+                          {replyingTo === q.id ? (
+                            <div className="space-y-2">
+                              <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 resize-none" rows={3} placeholder="Scrivi la tua risposta pubblica..." />
+                              <div className="flex gap-2">
+                                <button onClick={() => submitReply(q.id)} className="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 font-medium flex items-center justify-center gap-2">
+                                  <Send className="w-4 h-4" /> Pubblica Risposta
+                                </button>
+                                <button onClick={() => { setReplyingTo(null); setReplyText(''); }} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Annulla</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button onClick={() => { setReplyingTo(q.id); setReplyText(''); }} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 text-sm">
+                              <Edit className="w-4 h-4" /> Rispondi
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {questions.filter(q => q.answer).length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-gray-800 mb-3">✅ Risposte pubblicate ({questions.filter(q => q.answer).length})</h3>
+                    <div className="space-y-3">
+                      {questions.filter(q => q.answer).map(q => (
+                        <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <p className="font-semibold text-gray-600 text-sm">👤 {q.nickname}</p>
+                            <button onClick={() => deleteQuestion(q.id)} className="p-1 text-red-400 hover:text-red-600"><X className="w-4 h-4" /></button>
+                          </div>
+                          <p className="text-gray-700 text-sm mb-2 italic">"{q.text}"</p>
+                          <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg">
+                            <p className="text-xs font-bold text-blue-600 mb-1">🩺 La tua risposta:</p>
+                            <p className="text-gray-700 text-sm">{q.answer}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── TAB IMPOSTAZIONI ───────────────────────────────────────────────── */}
+        {adminSection === 'settings' && (
+          <div className="space-y-6">
+            {/* Prezzi */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                <span>💶</span> Prezzi Sedute
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta Individuale (€)</label>
+                  <input type="number" value={tempSettings.priceIndividual} onChange={(e) => setTempSettings(p => ({ ...p, priceIndividual: parseInt(e.target.value) || 0 }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="0" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta di Coppia (€)</label>
+                  <input type="number" value={tempSettings.priceCouple} onChange={(e) => setTempSettings(p => ({ ...p, priceCouple: parseInt(e.target.value) || 0 }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="0" />
+                </div>
+              </div>
+            </div>
+
+            {/* Durata */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                <span>⏱</span> Durata Sedute (minuti)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta Individuale</label>
+                  <input type="number" value={tempSettings.durationIndividual} onChange={(e) => setTempSettings(p => ({ ...p, durationIndividual: parseInt(e.target.value) || 50 }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="10" max="120" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Seduta di Coppia</label>
+                  <input type="number" value={tempSettings.durationCouple} onChange={(e) => setTempSettings(p => ({ ...p, durationCouple: parseInt(e.target.value) || 50 }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400" min="10" max="120" />
+                </div>
+              </div>
+            </div>
+
+            {/* Orari */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                <span>🕐</span> Orari Disponibilità
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ora Inizio</label>
+                  <select value={tempSettings.scheduleStart} onChange={(e) => setTempSettings(p => ({ ...p, scheduleStart: parseInt(e.target.value) }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
+                    {Array.from({ length: 13 }, (_, i) => i + 8).map(h => (
+                      <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Ora Fine</label>
+                  <select value={tempSettings.scheduleEnd} onChange={(e) => setTempSettings(p => ({ ...p, scheduleEnd: parseInt(e.target.value) }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400">
+                    {Array.from({ length: 13 }, (_, i) => i + 9).map(h => (
+                      <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Giorni Disponibili</label>
+                <div className="flex flex-wrap gap-2">
+                  {[{ d: 1, n: 'Lunedì' }, { d: 2, n: 'Martedì' }, { d: 3, n: 'Mercoledì' }, { d: 4, n: 'Giovedì' }, { d: 5, n: 'Venerdì' }, { d: 6, n: 'Sabato' }, { d: 0, n: 'Domenica' }].map(({ d, n }) => {
+                    const active = tempSettings.availableDays.includes(d);
+                    return (
+                      <button key={d} onClick={() => setTempSettings(p => ({
+                        ...p,
+                        availableDays: active ? p.availableDays.filter(x => x !== d) : [...p.availableDays, d]
+                      }))} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${active ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                        {n}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Telegram Config */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <h3 className="font-bold text-gray-800 text-lg mb-2 flex items-center gap-2">
+                <span>📱</span> Notifiche Telegram
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">Per configurare le notifiche Telegram, modifica direttamente il file <code className="bg-gray-100 px-1 rounded">prenota.html</code> inserendo il tuo <strong>Bot Token</strong> e <strong>Chat ID</strong> nelle variabili <code className="bg-gray-100 px-1 rounded">TELEGRAM_BOT_TOKEN</code> e <code className="bg-gray-100 px-1 rounded">TELEGRAM_CHAT_ID</code> in cima al codice.</p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <p className="text-xs text-gray-500 font-mono">
+                  1. Scrivi a @BotFather su Telegram → /newbot<br/>
+                  2. Copia il token ricevuto<br/>
+                  3. Scrivi un messaggio al tuo bot<br/>
+                  4. Vai su: api.telegram.org/bot<b>[TOKEN]</b>/getUpdates<br/>
+                  5. Copia il "chat":"id" dal risultato
+                </p>
+              </div>
+            </div>
+
+            <button onClick={saveSettings} className="w-full py-4 bg-green-500 text-white rounded-xl font-bold text-lg hover:bg-green-600 flex items-center justify-center gap-2">
+              <Check className="w-6 h-6" /> Salva Tutte le Impostazioni
+            </button>
+          </div>
+        )}
+
+        {/* Modali admin */}
         {showChangePasswordModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
               <h3 className="text-xl font-bold mb-4">Cambia Password</h3>
-              
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Nuova Password</label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    placeholder="Minimo 8 caratteri"
-                  />
+                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full p-2 border rounded" placeholder="Minimo 8 caratteri" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-1">Conferma Password</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    placeholder="Ripeti la password"
-                  />
+                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full p-2 border rounded" placeholder="Ripeti la password" />
                 </div>
-
                 <div className="flex gap-3">
-                  <button
-                    onClick={handleChangePassword}
-                    className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                  >
-                    Cambia Password
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowChangePasswordModal(false);
-                      setNewPassword('');
-                      setConfirmPassword('');
-                    }}
-                    className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
-                  >
-                    Annulla
-                  </button>
+                  <button onClick={handleChangePassword} className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Cambia Password</button>
+                  <button onClick={() => { setShowChangePasswordModal(false); setNewPassword(''); setConfirmPassword(''); }} className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300">Annulla</button>
                 </div>
               </div>
             </div>
@@ -1276,55 +1206,24 @@ function AppointmentSystem() {
             <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <h3 className="text-xl font-bold mb-4">Modifica Appuntamento</h3>
               <p className="mb-4">Paziente: <strong>{editingAppointment.patientName}</strong></p>
-              
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Nuova Data</label>
-                <input
-                  type="date"
-                  value={formatDate(selectedDate)}
-                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                  className="w-full p-2 border rounded"
-                />
+                <input type="date" value={formatDate(selectedDate)} onChange={(e) => setSelectedDate(new Date(e.target.value))} className="w-full p-2 border rounded" />
               </div>
-
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2">Nuovo Orario</label>
                 <div className="grid grid-cols-4 gap-2">
                   {getAvailableSlots(selectedDate).map(slot => (
-                    <button
-                      key={slot.time}
-                      onClick={() => slot.available && setSelectedTime(slot.time)}
-                      disabled={!slot.available}
-                      className={`p-2 rounded ${
-                        selectedTime === slot.time
-                          ? 'bg-blue-500 text-white'
-                          : slot.available
-                          ? 'bg-gray-100 hover:bg-gray-200'
-                          : 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
+                    <button key={slot.time} onClick={() => slot.available && setSelectedTime(slot.time)} disabled={!slot.available}
+                      className={`p-2 rounded ${selectedTime === slot.time ? 'bg-blue-500 text-white' : slot.available ? 'bg-gray-100 hover:bg-gray-200' : 'bg-gray-50 text-gray-400 cursor-not-allowed'}`}>
                       {slot.time}
                     </button>
                   ))}
                 </div>
               </div>
-
               <div className="flex gap-3">
-                <button
-                  onClick={saveEditAppointment}
-                  className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                >
-                  Salva Modifiche
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingAppointment(null);
-                    setSelectedTime(null);
-                  }}
-                  className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
-                >
-                  Annulla
-                </button>
+                <button onClick={saveEditAppointment} className="flex-1 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Salva Modifiche</button>
+                <button onClick={() => { setEditingAppointment(null); setSelectedTime(null); }} className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300">Annulla</button>
               </div>
             </div>
           </div>
@@ -1334,61 +1233,25 @@ function AppointmentSystem() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg p-6 max-w-md w-full">
               <h3 className="text-xl font-bold mb-4">Blocca Slot Orario</h3>
-              
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Data</label>
-                  <input
-                    type="date"
-                    value={blockSlotDate}
-                    onChange={(e) => setBlockSlotDate(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
+                  <input type="date" value={blockSlotDate} onChange={(e) => setBlockSlotDate(e.target.value)} className="w-full p-2 border rounded" />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-1">Orario</label>
-                  <select
-                    value={blockSlotTime}
-                    onChange={(e) => setBlockSlotTime(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  >
+                  <select value={blockSlotTime} onChange={(e) => setBlockSlotTime(e.target.value)} className="w-full p-2 border rounded">
                     <option value="">Seleziona orario</option>
-                    {generateTimeSlots().map(time => (
-                      <option key={time} value={time}>{time}</option>
-                    ))}
+                    {generateTimeSlots().map(time => <option key={time} value={time}>{time}</option>)}
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-1">Motivo (opzionale)</label>
-                  <input
-                    type="text"
-                    value={blockSlotReason}
-                    onChange={(e) => setBlockSlotReason(e.target.value)}
-                    placeholder="Es: Impegno personale"
-                    className="w-full p-2 border rounded"
-                  />
+                  <input type="text" value={blockSlotReason} onChange={(e) => setBlockSlotReason(e.target.value)} placeholder="Es: Impegno personale" className="w-full p-2 border rounded" />
                 </div>
-
                 <div className="flex gap-3">
-                  <button
-                    onClick={blockTimeSlot}
-                    className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
-                  >
-                    Blocca Slot
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowBlockSlotModal(false);
-                      setBlockSlotDate('');
-                      setBlockSlotTime('');
-                      setBlockSlotReason('');
-                    }}
-                    className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300"
-                  >
-                    Annulla
-                  </button>
+                  <button onClick={blockTimeSlot} className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600">Blocca Slot</button>
+                  <button onClick={() => { setShowBlockSlotModal(false); setBlockSlotDate(''); setBlockSlotTime(''); setBlockSlotReason(''); }} className="flex-1 bg-gray-200 py-2 rounded hover:bg-gray-300">Annulla</button>
                 </div>
               </div>
             </div>
@@ -1398,6 +1261,7 @@ function AppointmentSystem() {
     );
   };
 
+  // ─── LOGIN MODAL ─────────────────────────────────────────────────────────────
   if (!isAdmin && showPasswordModal) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -1409,35 +1273,18 @@ function AppointmentSystem() {
             <h2 className="text-2xl font-bold text-gray-800">Area Professionista</h2>
             <p className="text-gray-600 mt-2">Inserisci la password per accedere</p>
           </div>
-          
-          <input
-            type="password"
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-            className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Password"
-          />
-          
+          <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+            className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Password" />
           <div className="flex gap-3">
-            <button
-              onClick={handleLogin}
-              className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600"
-            >
-              Accedi
-            </button>
-            <button
-              onClick={() => setShowPasswordModal(false)}
-              className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300"
-            >
-              Annulla
-            </button>
+            <button onClick={handleLogin} className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600">Accedi</button>
+            <button onClick={() => setShowPasswordModal(false)} className="flex-1 bg-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-300">Annulla</button>
           </div>
         </div>
       </div>
     );
   }
 
+  // ─── LAYOUT PRINCIPALE ───────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-4xl mx-auto">
@@ -1452,23 +1299,16 @@ function AppointmentSystem() {
                 <p className="text-sm text-gray-600">Psicologo - Prenotazione Online</p>
               </div>
             </div>
-            
             {!isAdmin && (
-              <button
-                onClick={() => setShowPasswordModal(true)}
-                className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center gap-2 text-sm"
-              >
-                <Lock className="w-4 h-4" />
-                Area Professionista
+              <button onClick={() => setShowPasswordModal(true)} className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center gap-2 text-sm">
+                <Lock className="w-4 h-4" /> Area Professionista
               </button>
             )}
           </div>
         </div>
-
         <div className="bg-white rounded-lg shadow-lg p-6">
           {isAdmin ? <ProfessionalView /> : <PatientView />}
         </div>
-
         {!isAdmin && (
           <div className="mt-6 text-center text-sm text-gray-600 bg-white rounded-lg p-4">
             <p className="font-semibold mb-2">🔒 Privacy e Riservatezza</p>

@@ -1154,6 +1154,15 @@ function AppointmentSystem() {
     await db.ref('appointments/' + newAppointment.id).set(newAppointment);
     const telegramMsg = `🗓 <b>Nuova Prenotazione!</b>\n\n👤 <b>Paziente:</b> ${patientName}\n📧 Email: ${patientEmail}\n📱 Tel: ${patientPhone}\n\n📋 <b>Servizio:</b> ${SERVICES[selectedService].name}\n🖥 <b>Piattaforma:</b> ${PLATFORMS[selectedPlatform].name}\n📅 <b>Data:</b> ${formatDisplayDate(formatDate(selectedDate))}\n⏰ <b>Orario:</b> ${selectedTime}\n💶 <b>Prezzo:</b> €${SERVICES[selectedService].price}`;
     await sendTelegramNotification(telegramMsg);
+      // ─── TRACCIAMENTO CONVERSIONE GA4 ───────────────
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'conversion', {
+        event_category: 'prenotazione',
+        event_label: selectedService,
+        value: SERVICES[selectedService].price
+      });
+    }
+    // ─────────────────────────────────────────────────
     setShowConfirmation(true);
     setTimeout(() => {
       setSelectedService(null); setSelectedDate(new Date()); setSelectedTime(null);
@@ -1381,3 +1390,4 @@ ReactDOM.render(<AppointmentSystem />, document.getElementById('root'));
     </script>
 </body>
 </html>
+

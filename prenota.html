@@ -246,10 +246,6 @@ const exportToCSV = (appointments) => {
   document.body.removeChild(link);
 };
 
-// ════════════════════════════════════════════════════════════════════════════
-// PATIENTVIEW — componente di modulo (fuori da AppointmentSystem)
-// Riceve tutto tramite props: nessun hook o stato locale relativo al form
-// ════════════════════════════════════════════════════════════════════════════
 function PatientView({
   questions, settings, appointments, blockedSlots,
   selectedService, setSelectedService,
@@ -344,7 +340,6 @@ function PatientView({
         </div>
       )}
 
-      {/* Selezione servizio */}
       <div>
         <label className="block text-lg font-semibold text-gray-700 mb-4">1. Seleziona il tipo di seduta</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -371,7 +366,6 @@ function PatientView({
 
       {selectedService && (
         <>
-          {/* Piattaforma */}
           <div>
             <label className="block text-lg font-semibold text-gray-700 mb-4">2. Scegli la piattaforma per la videochiamata</label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -391,7 +385,6 @@ function PatientView({
             <p className="text-xs text-gray-500 mt-2">Riceverai il link per la videochiamata via email 24 ore prima dell'appuntamento</p>
           </div>
 
-          {/* Calendario */}
           <div>
             <label className="block text-lg font-semibold text-gray-700 mb-4">3. Seleziona la data</label>
             <div className="bg-white border rounded-lg p-4">
@@ -428,7 +421,6 @@ function PatientView({
             </div>
           </div>
 
-          {/* Orari */}
           <div>
             <label className="block text-lg font-semibold text-gray-700 mb-4">4. Seleziona l'orario - {formatDisplayDate(formatDate(selectedDate))}</label>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
@@ -444,7 +436,6 @@ function PatientView({
             <p className="text-xs text-gray-500 mt-3">💡 Le sedute durano {SERVICES[selectedService]?.duration} minuti. Gli slot vicini a prenotazioni esistenti potrebbero risultare non disponibili.</p>
           </div>
 
-          {/* Form dati paziente */}
           {selectedTime && selectedPlatform && (
             <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">5. I tuoi dati</h3>
@@ -501,7 +492,6 @@ function PatientView({
         </>
       )}
 
-      {/* ─── SEZIONE DOMANDE ANONIME ────────────────────────────────────────── */}
       <div className="mt-10 border-t-2 border-gray-100 pt-8">
         <div className="flex items-center gap-3 mb-2">
           <HelpCircle className="w-7 h-7 text-purple-500" />
@@ -562,7 +552,6 @@ function PatientView({
         )}
       </div>
 
-      {/* Modali paziente */}
       {showConsentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -636,9 +625,6 @@ function PatientView({
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// PROFESSIONALVIEW — componente di modulo (fuori da AppointmentSystem)
-// ════════════════════════════════════════════════════════════════════════════
 function ProfessionalView({
   appointments, blockedSlots, questions, settings,
   setIsAdmin,
@@ -689,7 +675,6 @@ function ProfessionalView({
         ))}
       </div>
 
-      {/* ── TAB APPUNTAMENTI ───────────────────────────────────────────────── */}
       {adminSection === 'appointments' && (
         <div className="space-y-4">
           <div className="flex flex-wrap gap-3">
@@ -773,7 +758,6 @@ function ProfessionalView({
         </div>
       )}
 
-      {/* ── TAB DOMANDE ────────────────────────────────────────────────────── */}
       {adminSection === 'questions' && (
         <div className="space-y-4">
           {questions.length === 0 ? (
@@ -842,7 +826,6 @@ function ProfessionalView({
         </div>
       )}
 
-      {/* ── TAB IMPOSTAZIONI ───────────────────────────────────────────────── */}
       {adminSection === 'settings' && (
         <div className="space-y-6">
           <div className="bg-white border border-gray-200 rounded-xl p-5">
@@ -911,7 +894,7 @@ function ProfessionalView({
                 1. Scrivi a @BotFather su Telegram → /newbot<br/>
                 2. Copia il token ricevuto<br/>
                 3. Scrivi un messaggio al tuo bot<br/>
-                4. Vai su: api.telegram.org/bot<b>[TOKEN]</b>/getUpdates<br/>
+                4. Vai su: api.telegram.org/bot[TOKEN]/getUpdates<br/>
                 5. Copia il "chat":"id" dal risultato
               </p>
             </div>
@@ -923,7 +906,6 @@ function ProfessionalView({
         </div>
       )}
 
-      {/* Modali admin */}
       {showChangePasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
@@ -1006,7 +988,6 @@ function ProfessionalView({
   );
 }
 
-// ─── COMPONENTE PRINCIPALE ────────────────────────────────────────────────────
 function AppointmentSystem() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
@@ -1161,12 +1142,13 @@ function AppointmentSystem() {
     await db.ref('appointments/' + newAppointment.id).set(newAppointment);
     const telegramMsg = `🗓 <b>Nuova Prenotazione!</b>\n\n👤 <b>Paziente:</b> ${patientName}\n📧 Email: ${patientEmail}\n📱 Tel: ${patientPhone}\n\n📋 <b>Servizio:</b> ${SERVICES[selectedService].name}\n🖥 <b>Piattaforma:</b> ${PLATFORMS[selectedPlatform].name}\n📅 <b>Data:</b> ${formatDisplayDate(formatDate(selectedDate))}\n⏰ <b>Orario:</b> ${selectedTime}\n💶 <b>Prezzo:</b> €${SERVICES[selectedService].price}`;
     await sendTelegramNotification(telegramMsg);
-      // ─── TRACCIAMENTO CONVERSIONE GA4 ───────────────
+    // ─── TRACCIAMENTO CONVERSIONE GA4 ───────────────
     if (typeof gtag !== 'undefined') {
-      gtag('event', 'conversion', {
+      gtag('event', 'prenota_click', {
         event_category: 'prenotazione',
         event_label: selectedService,
-        value: SERVICES[selectedService].price
+        value: SERVICES[selectedService].price,
+        currency: 'EUR'
       });
     }
     // ─────────────────────────────────────────────────
@@ -1243,7 +1225,6 @@ function AppointmentSystem() {
     alert('✅ Impostazioni salvate! Le modifiche sono ora visibili ai pazienti.');
   };
 
-  // ─── LOGIN MODAL ─────────────────────────────────────────────────────────────
   if (!isAdmin && showPasswordModal) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -1266,7 +1247,6 @@ function AppointmentSystem() {
     );
   }
 
-  // ─── LAYOUT PRINCIPALE ───────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-4xl mx-auto">
@@ -1397,5 +1377,3 @@ ReactDOM.render(<AppointmentSystem />, document.getElementById('root'));
     </script>
 </body>
 </html>
-
-
